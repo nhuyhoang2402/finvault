@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinVault — Tài Chính Cá Nhân</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07090f;
+  --s1: #0d1120;
+  --s2: #121827;
+  --s3: #1a2235;
+  --border: #1e2a40;
+  --border2: #243050;
+  --mint: #3dffa0;
+  --mint-dim: rgba(61,255,160,0.12);
+  --mint-glow: rgba(61,255,160,0.06);
+  --gold: #f5c842;
+  --gold-dim: rgba(245,200,66,0.12);
+  --red: #ff5c5c;
+  --red-dim: rgba(255,92,92,0.12);
+  --blue: #5ca8ff;
+  --blue-dim: rgba(92,168,255,0.12);
+  --purple: #b06bff;
+  --purple-dim: rgba(176,107,255,0.12);
+  --text: #e2eaf8;
+  --text2: #8a9ab8;
+  --text3: #4a5670;
+  --mono: 'DM Mono', monospace;
+  --sans: 'Be Vietnam Pro', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0; opacity:0.4;
+}
+
+/* Ambient glows */
+.glow-tl {
+  position:fixed; top:-300px; left:-300px;
+  width:700px; height:700px;
+  background: radial-gradient(circle, rgba(61,255,160,0.035) 0%, transparent 65%);
+  pointer-events:none; z-index:0;
+}
+.glow-br {
+  position:fixed; bottom:-200px; right:-200px;
+  width:600px; height:600px;
+  background: radial-gradient(circle, rgba(245,200,66,0.03) 0%, transparent 65%);
+  pointer-events:none; z-index:0;
+}
+
+/* === APP SHELL === */
+.app { position:relative; z-index:1; display:flex; flex-direction:column; min-height:100vh; }
+
+/* Top bar */
+.topbar {
+  background: var(--s1);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky; top:0; z-index:100;
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--mint);
+  letter-spacing: 1px;
+  display:flex; align-items:center; gap:10px;
+}
+.logo-icon {
+  width:28px; height:28px;
+  background: linear-gradient(135deg, var(--mint), var(--blue));
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px;
+}
+.logo span { color: var(--text3); }
+
+.topbar-date {
+  font-family: var(--mono);
+  font-size:12px;
+  color: var(--text3);
+}
+
+/* Main Tabs */
+.main-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--s1);
+  padding: 0 32px;
+}
+.main-tab {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  display:flex; align-items:center; gap:8px;
+  white-space: nowrap;
+}
+.main-tab:hover { color: var(--text2); }
+.main-tab.active { color: var(--mint); border-bottom-color: var(--mint); }
+.main-tab.invest-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.main-tab.task-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* === TASK MODULE === */
+.task-date-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px; border-bottom:1px solid var(--border);
+}
+.task-date-nav { display:flex; align-items:center; gap:12px; }
+.task-date-label { font-size:16px; font-weight:800; }
+.task-date-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+.task-stats-row { display:flex; gap:20px; }
+.task-stat { font-size:12px; color:var(--text3); }
+.task-stat span { font-weight:700; }
+.task-stat .done { color:var(--mint); }
+.task-stat .pending { color:var(--gold); }
+.task-stat .failed { color:var(--red); }
+
+.task-item {
+  border-bottom:1px solid var(--border);
+  transition: background 0.15s;
+}
+.task-item:last-child { border-bottom:none; }
+.task-item:hover { background:var(--s2); }
+
+.task-main {
+  display:flex; align-items:flex-start; gap:14px; padding:14px 20px;
+  cursor:pointer;
+}
+.task-check {
+  width:22px; height:22px; border-radius:6px; border:2px solid var(--border2);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;
+  transition:all 0.2s; cursor:pointer; background:transparent;
+  font-size:12px;
+}
+.task-check.done { background:var(--mint); border-color:var(--mint); color:#060a10; }
+.task-check.failed { background:var(--red-dim); border-color:var(--red); color:var(--red); }
+.task-check.pending { border-color:var(--gold); }
+
+.task-body { flex:1; min-width:0; }
+.task-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+.task-name.done-text { text-decoration:line-through; color:var(--text3); }
+.task-meta { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.task-time { font-family:var(--mono); font-size:11px; color:var(--blue); background:var(--blue-dim); padding:2px 8px; border-radius:4px; }
+.task-content-preview { font-size:12px; color:var(--text3); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:400px; }
+.task-reason { font-size:12px; color:var(--text2); margin-top:6px; padding:6px 10px; background:var(--s3); border-radius:6px; border-left:3px solid; }
+.task-reason.done { border-left-color:var(--mint); }
+.task-reason.failed { border-left-color:var(--red); }
+.task-actions { display:flex; gap:6px; padding:0 20px 12px 56px; }
+
+.task-priority { padding:2px 8px; border-radius:4px; font-size:10px; font-weight:700; text-transform:uppercase; }
+.pri-high { background:rgba(255,92,92,0.15); color:var(--red); }
+.pri-med { background:var(--gold-dim); color:var(--gold); }
+.pri-low { background:var(--mint-dim); color:var(--mint); }
+
+.task-expand-btn { background:none; border:none; color:var(--text3); font-size:16px; cursor:pointer; padding:4px; border-radius:6px; transition:all 0.15s; margin-left:auto; }
+.task-expand-btn:hover { background:var(--s3); color:var(--text); }
+
+.task-detail { display:none; padding:0 20px 14px 56px; }
+.task-detail.open { display:block; }
+.task-detail-content { font-size:13px; color:var(--text2); background:var(--s2); border-radius:8px; padding:10px 14px; line-height:1.6; white-space:pre-wrap; }
+
+.task-summary-bar {
+  background:linear-gradient(135deg, rgba(92,168,255,0.06) 0%, transparent 60%);
+  border:1px solid rgba(92,168,255,0.15); border-radius:16px; padding:16px 24px;
+  display:flex; align-items:center; gap:24px; flex-wrap:wrap;
+}
+.task-sum-item { text-align:center; }
+.task-sum-val { font-family:var(--mono); font-size:22px; font-weight:500; }
+.task-sum-label { font-size:11px; color:var(--text3); margin-top:2px; text-transform:uppercase; letter-spacing:0.5px; }
+
+/* Content areas */
+.tab-content { display:none; padding:28px 32px; flex-direction:column; gap:24px; animation: fadeUp 0.3s ease; }
+.tab-content.active { display:flex; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Page header */
+.page-header { display:flex; justify-content:space-between; align-items:flex-start; }
+.page-title { font-size:24px; font-weight:800; letter-spacing:-0.5px; }
+.page-sub { font-size:13px; color:var(--text3); margin-top:4px; }
+.header-actions { display:flex; gap:10px; align-items:center; }
+
+/* Buttons */
+.btn {
+  padding:9px 16px; border-radius:10px; border:none;
+  font-family: var(--sans); font-size:13px; font-weight:600;
+  cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px;
+}
+.btn-mint { background:var(--mint); color:#060a10; }
+.btn-mint:hover { opacity:0.85; transform:translateY(-1px); box-shadow:0 4px 20px rgba(61,255,160,0.25); }
+.btn-gold { background:var(--gold); color:#060a10; }
+.btn-gold:hover { opacity:0.85; transform:translateY(-1px); box-shadow:0 4px 20px rgba(245,200,66,0.25); }
+.btn-ghost { background:transparent; border:1px solid var(--border2); color:var(--text2); }
+.btn-ghost:hover { border-color:var(--mint); color:var(--mint); }
+.btn-ghost-gold:hover { border-color:var(--gold); color:var(--gold); }
+.btn-danger { background:var(--red-dim); color:var(--red); border:1px solid rgba(255,92,92,0.2); }
+.btn-danger:hover { background:rgba(255,92,92,0.2); }
+.btn-sm { padding:6px 12px; font-size:12px; }
+
+/* === STAT CARDS === */
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.stats-grid-3 { grid-template-columns:repeat(3,1fr); }
+
+.stat-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius:16px;
+  padding:20px;
+  position:relative; overflow:hidden;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover { transform:translateY(-2px); border-color:var(--border2); box-shadow:0 8px 30px rgba(0,0,0,0.3); }
+.stat-card-accent { border-color:rgba(61,255,160,0.2); }
+.stat-card-accent::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--mint),transparent); }
+
+.stat-label { font-size:12px; font-weight:500; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.stat-value { font-family:var(--mono); font-size:22px; font-weight:500; color:var(--text); margin-bottom:6px; }
+.stat-value.big { font-size:28px; }
+.stat-change { font-size:12px; display:flex; align-items:center; gap:4px; }
+.stat-change.up { color:var(--mint); }
+.stat-change.down { color:var(--red); }
+.stat-icon { position:absolute; top:16px; right:16px; font-size:20px; opacity:0.4; }
+
+/* === CONTENT GRID === */
+.content-grid { display:grid; grid-template-columns:1fr 360px; gap:20px; }
+.content-grid-full { grid-template-columns:1fr; }
+
+/* === CARD === */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+}
+.card-header {
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.card-title { font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+.card-body { padding:20px; }
+
+/* === CHART BAR === */
+.chart-bars { display:flex; align-items:flex-end; gap:6px; height:120px; padding:0 4px; }
+.bar-group { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.bar-wrap { flex:1; display:flex; align-items:flex-end; gap:2px; width:100%; }
+.bar {
+  flex:1; border-radius:4px 4px 0 0;
+  transition: height 0.5s cubic-bezier(.34,1.56,.64,1);
+  min-height:4px;
+}
+.bar-thu { background: linear-gradient(to top, var(--mint), rgba(61,255,160,0.4)); }
+.bar-chi { background: linear-gradient(to top, var(--red), rgba(255,92,92,0.3)); }
+.bar-label { font-size:10px; color:var(--text3); font-family:var(--mono); }
+
+.chart-legend { display:flex; gap:16px; margin-top:12px; }
+.legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); }
+.legend-dot { width:8px; height:8px; border-radius:50%; }
+
+/* === DONUT CHART (CSS) === */
+.donut-wrap { display:flex; align-items:center; gap:24px; }
+.donut {
+  width:120px; height:120px; border-radius:50%; flex-shrink:0;
+  background: conic-gradient(
+    var(--mint) 0deg 115deg,
+    var(--gold) 115deg 187deg,
+    var(--red) 187deg 230deg,
+    var(--blue) 230deg 270deg,
+    var(--purple) 270deg 310deg,
+    var(--text3) 310deg 360deg
+  );
+  position:relative;
+}
+.donut::after {
+  content:''; position:absolute; inset:25px;
+  background:var(--s1); border-radius:50%;
+}
+.donut-labels { display:flex; flex-direction:column; gap:8px; flex:1; }
+.donut-item { display:flex; align-items:center; gap:8px; font-size:12px; }
+.donut-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.donut-name { color:var(--text2); flex:1; }
+.donut-pct { font-family:var(--mono); color:var(--text); font-size:11px; }
+
+/* === TRANSACTION LIST === */
+.tx-list { display:flex; flex-direction:column; }
+.tx-item {
+  display:flex; align-items:center; gap:14px;
+  padding:12px 20px;
+  border-bottom:1px solid var(--border);
+  transition:background 0.15s;
+}
+.tx-item:last-child { border-bottom:none; }
+.tx-item:hover { background:var(--s2); }
+.tx-icon {
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.tx-info { flex:1; min-width:0; }
+.tx-name { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tx-cat { font-size:11px; color:var(--text3); margin-top:2px; }
+.tx-amount { font-family:var(--mono); font-size:14px; font-weight:500; text-align:right; }
+.tx-date { font-size:10px; color:var(--text3); text-align:right; margin-top:2px; font-family:var(--mono); }
+.tx-amount.income { color:var(--mint); }
+.tx-amount.expense { color:var(--red); }
+
+/* === PROGRESS BAR === */
+.progress-wrap { margin-bottom:16px; }
+.progress-header { display:flex; justify-content:space-between; margin-bottom:6px; }
+.progress-label { font-size:13px; font-weight:600; }
+.progress-val { font-family:var(--mono); font-size:12px; color:var(--text2); }
+.progress-track { height:6px; background:var(--s3); border-radius:999px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:999px; transition:width 1s cubic-bezier(.34,1.56,.64,1); }
+.progress-fill.mint { background:linear-gradient(90deg, var(--mint), rgba(61,255,160,0.5)); }
+.progress-fill.gold { background:linear-gradient(90deg, var(--gold), rgba(245,200,66,0.5)); }
+.progress-fill.red { background:linear-gradient(90deg, var(--red), rgba(255,92,92,0.5)); }
+.progress-sub { font-size:11px; color:var(--text3); margin-top:4px; }
+
+/* === CALENDAR === */
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.cal-nav { background:transparent; border:1px solid var(--border); color:var(--text2); border-radius:8px; width:30px; height:30px; cursor:pointer; font-size:14px; transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
+.cal-nav:hover { border-color:var(--mint); color:var(--mint); }
+.cal-month { font-size:15px; font-weight:700; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cal-day-name { text-align:center; font-size:10px; color:var(--text3); padding:4px 0; font-weight:600; text-transform:uppercase; }
+.cal-day {
+  aspect-ratio:1; border-radius:8px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; font-size:12px; cursor:pointer;
+  position:relative; transition:all 0.15s; color:var(--text2);
+}
+.cal-day:hover { background:var(--s2); color:var(--text); }
+.cal-day.today { background:var(--mint-dim); color:var(--mint); font-weight:700; }
+.cal-day.has-event::after {
+  content:''; position:absolute; bottom:3px;
+  width:4px; height:4px; border-radius:50%; background:var(--gold);
+}
+.cal-day.other-month { color:var(--text3); opacity:0.4; }
+.cal-day.selected { background:var(--mint-dim); border:1px solid var(--mint); color:var(--mint); }
+
+/* === REMINDER LIST === */
+.reminder-item {
+  display:flex; align-items:center; gap:12px; padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+.reminder-item:last-child { border-bottom:none; }
+.reminder-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.reminder-info { flex:1; }
+.reminder-name { font-size:13px; font-weight:600; }
+.reminder-date { font-size:11px; color:var(--text3); margin-top:2px; }
+.reminder-amount { font-family:var(--mono); font-size:13px; color:var(--red); }
+.badge { padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+.badge-red { background:var(--red-dim); color:var(--red); }
+.badge-gold { background:var(--gold-dim); color:var(--gold); }
+.badge-mint { background:var(--mint-dim); color:var(--mint); }
+
+/* === INVESTMENT MODULE === */
+.invest-header-bar {
+  background: linear-gradient(135deg, rgba(245,200,66,0.06) 0%, transparent 60%);
+  border: 1px solid rgba(245,200,66,0.15);
+  border-radius:16px;
+  padding:20px 24px;
+  display:flex; align-items:center; gap:24px;
+}
+.invest-total-label { font-size:12px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.invest-total-val { font-family:var(--mono); font-size:32px; font-weight:500; color:var(--gold); }
+.invest-divider { width:1px; height:50px; background:var(--border); }
+.invest-mini-stat { flex:1; }
+.invest-mini-label { font-size:11px; color:var(--text3); margin-bottom:4px; }
+.invest-mini-val { font-family:var(--mono); font-size:16px; font-weight:500; }
+
+/* Investment table */
+.invest-table { width:100%; border-collapse:collapse; }
+.invest-table th {
+  text-align:left; padding:10px 16px;
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+  color:var(--text3); border-bottom:1px solid var(--border);
+}
+.invest-table td {
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+  vertical-align:middle;
+}
+.invest-table tr:last-child td { border-bottom:none; }
+.invest-table tr:hover td { background:var(--s2); }
+.invest-type-badge { padding:3px 10px; border-radius:6px; font-size:11px; font-weight:700; }
+.type-stock { background:var(--mint-dim); color:var(--mint); }
+.type-crypto { background:var(--purple-dim); color:var(--purple); }
+.type-gold { background:var(--gold-dim); color:var(--gold); }
+.type-saving { background:var(--blue-dim); color:var(--blue); }
+.type-realestate { background:rgba(255,92,92,0.1); color:var(--red); }
+.profit { color:var(--mint); font-family:var(--mono); }
+.loss { color:var(--red); font-family:var(--mono); }
+.neutral { color:var(--text2); font-family:var(--mono); }
+.invest-name-cell { display:flex; align-items:center; gap:10px; }
+.invest-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; }
+
+/* History list */
+.history-item {
+  display:flex; align-items:center; gap:12px; padding:11px 20px;
+  border-bottom:1px solid var(--border); font-size:13px;
+}
+.history-item:last-child { border-bottom:none; }
+.history-type { font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; text-transform:uppercase; }
+.h-buy { background:var(--mint-dim); color:var(--mint); }
+.h-sell { background:var(--red-dim); color:var(--red); }
+.h-update { background:var(--blue-dim); color:var(--blue); }
+.history-name { flex:1; font-weight:600; }
+.history-detail { color:var(--text3); font-size:11px; }
+.history-val { font-family:var(--mono); font-size:13px; }
+
+/* === MODAL === */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200;
+  display:none; align-items:center; justify-content:center;
+  backdrop-filter:blur(4px); animation:fadeIn 0.2s ease;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--s1); border:1px solid var(--border2); border-radius:20px;
+  width:480px; max-width:95vw; max-height:90vh; overflow-y:auto;
+  animation:slideUp 0.3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp { from { opacity:0; transform:translateY(30px) scale(0.97); } to { opacity:1; transform:none; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.modal-title { font-size:16px; font-weight:800; }
+.modal-close { background:none; border:none; color:var(--text3); font-size:20px; cursor:pointer; padding:4px 8px; border-radius:6px; transition:all 0.15s; }
+.modal-close:hover { background:var(--s3); color:var(--text); }
+.modal-body { padding:24px; display:flex; flex-direction:column; gap:16px; }
+.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+
+/* Form fields */
+.field { display:flex; flex-direction:column; gap:6px; }
+.field label { font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; }
+.field input, .field select, .field textarea {
+  background:var(--s2); border:1px solid var(--border2);
+  border-radius:10px; padding:10px 14px;
+  font-family:var(--sans); font-size:14px; color:var(--text);
+  transition:border-color 0.2s; outline:none; width:100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color:var(--mint); box-shadow:0 0 0 3px rgba(61,255,160,0.08); }
+.field select option { background:var(--s2); }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.type-toggle { display:flex; gap:6px; }
+.type-btn {
+  flex:1; padding:9px; border-radius:10px; border:1px solid var(--border2);
+  background:transparent; font-family:var(--sans); font-size:13px; font-weight:600;
+  color:var(--text3); cursor:pointer; transition:all 0.2s; text-align:center;
+}
+.type-btn.thu.selected { background:var(--mint-dim); border-color:var(--mint); color:var(--mint); }
+.type-btn.chi.selected { background:var(--red-dim); border-color:var(--red); color:var(--red); }
+
+/* Tabs inside card */
+.inner-tabs { display:flex; gap:2px; padding:4px; background:var(--s2); border-radius:10px; }
+.inner-tab { flex:1; padding:7px 10px; border-radius:8px; border:none; background:transparent; font-family:var(--sans); font-size:12px; font-weight:600; color:var(--text3); cursor:pointer; transition:all 0.2s; }
+.inner-tab.active { background:var(--s1); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:999px; }
+::-webkit-scrollbar-thumb:hover { background:var(--text3); }
+
+/* Empty state */
+.empty { text-align:center; padding:40px 20px; color:var(--text3); }
+.empty-icon { font-size:36px; margin-bottom:12px; }
+.empty-text { font-size:14px; }
+
+/* Alert strip */
+.alert-strip {
+  background: rgba(245,200,66,0.06);
+  border: 1px solid rgba(245,200,66,0.2);
+  border-radius:12px; padding:12px 16px;
+  display:flex; align-items:center; gap:10px;
+  font-size:13px; color:var(--gold);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+  .content-grid { grid-template-columns:1fr; }
+  .topbar { padding:0 16px; }
+  .main-tabs { padding:0 16px; overflow-x:auto; }
+  .tab-content { padding:20px 16px; }
+}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .stats-grid.stats-grid-3 { grid-template-columns:1fr; }
+  .field-row { grid-template-columns:1fr; }
+  .invest-header-bar { flex-direction:column; gap:12px; }
+  .invest-divider { display:none; }
+}
+</style>
+</head>
+<body>
+<div class="glow-tl"></div>
+<div class="glow-br"></div>
+
+<div class="app">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">💎</div>
+      FIN<span>VAULT</span>
+    </div>
+    <div class="topbar-date" id="topbar-date"></div>
+  </div>
+
+  <!-- MAIN TABS -->
+  <div class="main-tabs">
+    <div class="main-tab active" onclick="switchMainTab('finance', this)">📊 Tài Chính Cá Nhân</div>
+    <div class="main-tab invest-tab" onclick="switchMainTab('invest', this)">📈 Đầu Tư</div>
+    <div class="main-tab task-tab" onclick="switchMainTab('task', this)">✅ Công Việc</div>
+  </div>
+
+  <!-- ===== MODULE 1: TÀI CHÍNH CÁ NHÂN ===== -->
+  <div class="tab-content active" id="tab-finance">
+
+    <!-- Sub tabs -->
+    <div style="display:flex;gap:2px;padding:4px;background:var(--s1);border:1px solid var(--border);border-radius:12px;width:fit-content;">
+      <button class="inner-tab active" onclick="switchSubTab('dashboard',this)">🏠 Tổng Quan</button>
+      <button class="inner-tab" onclick="switchSubTab('transactions',this)">💸 Thu / Chi</button>
+      <button class="inner-tab" onclick="switchSubTab('schedule',this)">📅 Lịch Trình</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="sub-dashboard">
+      <div class="stats-grid" id="dashboard-stats">
+        <div class="stat-card stat-card-accent">
+          <div class="stat-label">💰 Số Dư Hiện Tại</div>
+          <div class="stat-value big" id="dash-sodu">0 ₫</div>
+          <div class="stat-change up">↑ Tháng này tốt hơn</div>
+          <div class="stat-icon">🏦</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">📥 Thu Nhập Tháng</div>
+          <div class="stat-value" id="dash-thu">0 ₫</div>
+          <div class="stat-change up" id="dash-thu-change">—</div>
+          <div class="stat-icon">📈</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">📤 Chi Tiêu Tháng</div>
+          <div class="stat-value" id="dash-chi">0 ₫</div>
+          <div class="stat-change" id="dash-chi-change">—</div>
+          <div class="stat-icon">🛒</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">💡 Tiết Kiệm Tháng</div>
+          <div class="stat-value" id="dash-tietkiem">0 ₫</div>
+          <div class="stat-change" id="dash-tk-change">—</div>
+          <div class="stat-icon">🎯</div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <!-- Chart -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Dòng Tiền 6 Tháng</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-bars" id="flow-chart"></div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--mint)"></div>Thu nhập</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Chi tiêu</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings goals -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎯 Mục Tiêu Tiết Kiệm</div>
+            <button class="btn btn-ghost btn-sm" onclick="openGoalModal()">+ Thêm</button>
+          </div>
+          <div class="card-body" id="goals-list">
+            <div class="empty"><div class="empty-icon">🎯</div><div class="empty-text">Chưa có mục tiêu nào</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category chart -->
+      <div class="content-grid">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🧁 Chi Tiêu Theo Danh Mục</div></div>
+          <div class="card-body">
+            <div class="donut-wrap" id="category-chart">
+              <div style="color:var(--text3);font-size:13px">Chưa có dữ liệu chi tiêu</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚡ Giao Dịch Gần Đây</div></div>
+          <div class="tx-list" id="recent-tx-list">
+            <div class="empty"><div class="empty-icon">💸</div><div class="empty-text">Chưa có giao dịch</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div id="sub-transactions" style="display:none;flex-direction:column;gap:16px;">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Thu / Chi</div>
+          <div class="page-sub">Ghi lại mọi khoản tiền của bạn</div>
+        </div>
+        <div class="header-actions">
+          <select class="btn btn-ghost" id="filter-month" onchange="renderTransactions()" style="cursor:pointer;">
+            <option value="">Tất cả tháng</option>
+          </select>
+          <select class="btn btn-ghost" id="filter-cat" onchange="renderTransactions()" style="cursor:pointer;">
+            <option value="">Tất cả danh mục</option>
+          </select>
+          <button class="btn btn-mint" onclick="openTxModal()">+ Thêm Giao Dịch</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tx-list" id="tx-list">
+          <div class="empty"><div class="empty-icon">💸</div><div class="empty-text">Chưa có giao dịch nào. Thêm giao dịch đầu tiên!</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="sub-schedule" style="display:none;flex-direction:column;gap:16px;">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Lịch Trình Tài Chính</div>
+          <div class="page-sub">Theo dõi các khoản định kỳ và đến hạn</div>
+        </div>
+        <button class="btn btn-mint" onclick="openReminderModal()">+ Thêm Nhắc Nhở</button>
+      </div>
+      <div id="upcoming-alert" style="display:none;"></div>
+      <div class="content-grid">
+        <div class="card">
+          <div class="card-header"><div class="card-title">📅 Lịch Tháng</div>
+            <div style="display:flex;gap:6px;">
+              <button class="cal-nav" onclick="prevMonth()">‹</button>
+              <button class="cal-nav" onclick="nextMonth()">›</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="cal-header"><div class="cal-month" id="cal-month-label"></div></div>
+            <div class="cal-grid" id="calendar-grid"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🔔 Nhắc Nhở Định Kỳ</div></div>
+          <div style="padding:8px 20px;" id="reminder-list">
+            <div class="empty"><div class="empty-icon">🔔</div><div class="empty-text">Chưa có nhắc nhở nào</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== MODULE 2: ĐẦU TƯ ===== -->
+  <div class="tab-content" id="tab-invest">
+    <div class="page-header">
+      <div>
+        <div class="page-title" style="color:var(--gold)">📈 Danh Mục Đầu Tư</div>
+        <div class="page-sub">Theo dõi tài sản độc lập với thu chi hàng ngày</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-ghost-gold" onclick="openHistoryModal()">📋 Lịch Sử</button>
+        <button class="btn btn-gold" onclick="openInvestModal()">+ Thêm Khoản Đầu Tư</button>
+      </div>
+    </div>
+
+    <!-- Summary bar -->
+    <div class="invest-header-bar" id="invest-summary">
+      <div>
+        <div class="invest-total-label">💎 Tổng Danh Mục</div>
+        <div class="invest-total-val" id="invest-total">0 ₫</div>
+      </div>
+      <div class="invest-divider"></div>
+      <div class="invest-mini-stat">
+        <div class="invest-mini-label">Vốn Gốc</div>
+        <div class="invest-mini-val neutral" id="invest-capital">0 ₫</div>
+      </div>
+      <div class="invest-divider"></div>
+      <div class="invest-mini-stat">
+        <div class="invest-mini-label">Lãi / Lỗ</div>
+        <div class="invest-mini-val" id="invest-pnl">0 ₫</div>
+      </div>
+      <div class="invest-divider"></div>
+      <div class="invest-mini-stat">
+        <div class="invest-mini-label">ROI</div>
+        <div class="invest-mini-val" id="invest-roi">0%</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Investment table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Các Khoản Đầu Tư</div>
+          <select class="btn btn-ghost btn-sm" id="invest-filter" onchange="renderInvestments()" style="cursor:pointer;">
+            <option value="">Tất cả loại</option>
+            <option value="stock">Chứng Khoán</option>
+            <option value="crypto">Crypto</option>
+            <option value="gold">Vàng</option>
+            <option value="saving">Tiết Kiệm</option>
+            <option value="realestate">Bất Động Sản</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="invest-table" id="invest-table">
+            <thead>
+              <tr>
+                <th>Tên Khoản</th>
+                <th>Loại</th>
+                <th>Vốn Gốc</th>
+                <th>Giá Trị HT</th>
+                <th>Lãi/Lỗ</th>
+                <th>ROI</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="invest-tbody">
+              <tr><td colspan="7"><div class="empty"><div class="empty-icon">📈</div><div class="empty-text">Chưa có khoản đầu tư nào</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Allocation chart -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🥧 Phân Bổ Tài Sản</div></div>
+          <div class="card-body" id="invest-donut-wrap">
+            <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">Chưa có dữ liệu</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📋 Hiệu Suất Theo Loại</div></div>
+          <div class="card-body" id="invest-perf-list">
+            <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">Chưa có dữ liệu</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- ===== MODULE 3: CÔNG VIỆC ===== -->
+  <div class="tab-content" id="tab-task">
+    <!-- Summary bar -->
+    <div class="task-summary-bar" id="task-summary-bar">
+      <div class="task-sum-item">
+        <div class="task-sum-val" id="ts-total" style="color:var(--blue)">0</div>
+        <div class="task-sum-label">Tổng Task Hôm Nay</div>
+      </div>
+      <div style="width:1px;height:40px;background:var(--border)"></div>
+      <div class="task-sum-item">
+        <div class="task-sum-val" id="ts-done" style="color:var(--mint)">0</div>
+        <div class="task-sum-label">✅ Hoàn Thành</div>
+      </div>
+      <div class="task-sum-item">
+        <div class="task-sum-val" id="ts-pending" style="color:var(--gold)">0</div>
+        <div class="task-sum-label">⏳ Chưa Làm</div>
+      </div>
+      <div class="task-sum-item">
+        <div class="task-sum-val" id="ts-failed" style="color:var(--red)">0</div>
+        <div class="task-sum-label">❌ Không Hoàn Thành</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-family:var(--mono);font-size:24px;font-weight:500;color:var(--blue)" id="ts-rate">—</div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;">Tỷ Lệ Hoàn Thành</div>
+      </div>
+    </div>
+
+    <!-- Date nav + add button -->
+    <div class="card">
+      <div class="task-date-header">
+        <div class="task-date-nav">
+          <button class="cal-nav" onclick="taskPrevDay()">‹</button>
+          <div>
+            <div class="task-date-label" id="task-date-label"></div>
+            <div class="task-date-sub" id="task-date-sub"></div>
+          </div>
+          <button class="cal-nav" onclick="taskNextDay()">›</button>
+          <button class="btn btn-ghost btn-sm" onclick="taskGoToday()" style="margin-left:8px;">Hôm Nay</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="task-stats-row" id="task-stats-inline"></div>
+          <button class="btn btn-ghost btn-sm" style="color:var(--text3);font-size:12px;" onclick="openTaskHistoryModal()">📋 Lịch Sử</button>
+          <button class="btn btn-sm" style="background:var(--blue);color:#060a10;font-weight:700;" onclick="openTaskModal()">+ Thêm Task</button>
+        </div>
+      </div>
+
+      <!-- Task list -->
+      <div id="task-list">
+        <div class="empty" style="padding:48px 20px;">
+          <div class="empty-icon">✅</div>
+          <div class="empty-text">Không có task nào. Thêm công việc cho ngày này!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly overview -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 Tổng Quan 7 Ngày Gần Đây</div></div>
+      <div class="card-body">
+        <div id="weekly-overview" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+      </div>
+    </div>
+  </div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Modal: Task -->
+<div class="modal-overlay" id="modal-task">
+  <div class="modal" style="width:520px;">
+    <div class="modal-header">
+      <div class="modal-title" id="task-modal-title">✅ Thêm Task Công Việc</div>
+      <button class="modal-close" onclick="closeModal('modal-task')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Tên Công Việc</label>
+        <input type="text" id="task-name" placeholder="VD: Họp team, Làm báo cáo, Gọi khách hàng...">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Thời Gian Bắt Đầu</label>
+          <input type="time" id="task-time-start">
+        </div>
+        <div class="field">
+          <label>Thời Gian Kết Thúc</label>
+          <input type="time" id="task-time-end">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Ngày</label>
+          <input type="date" id="task-date-input">
+        </div>
+        <div class="field">
+          <label>Mức Độ Ưu Tiên</label>
+          <select id="task-priority">
+            <option value="high">🔴 Cao</option>
+            <option value="med" selected>🟡 Trung Bình</option>
+            <option value="low">🟢 Thấp</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Nội Dung / Mô Tả</label>
+        <textarea id="task-content" rows="3" placeholder="Chi tiết công việc, mục tiêu cần đạt, tài liệu liên quan..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task')">Huỷ</button>
+      <button class="btn btn-sm" style="background:var(--blue);color:#060a10;font-weight:700;" onclick="saveTask()">💾 Lưu Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Task Status (done/failed reason) -->
+<div class="modal-overlay" id="modal-task-status">
+  <div class="modal" style="width:440px;">
+    <div class="modal-header">
+      <div class="modal-title" id="status-modal-title">Cập Nhật Trạng Thái</div>
+      <button class="modal-close" onclick="closeModal('modal-task-status')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;margin-bottom:4px;">
+        <button class="type-btn thu" id="status-btn-done" onclick="selectStatus('done')" style="flex:1;padding:12px;">✅ Hoàn Thành</button>
+        <button class="type-btn chi" id="status-btn-failed" onclick="selectStatus('failed')" style="flex:1;padding:12px;">❌ Không Hoàn Thành</button>
+      </div>
+      <input type="hidden" id="status-value" value="done">
+      <div class="field">
+        <label id="status-reason-label">Lý Do / Ghi Chú</label>
+        <textarea id="task-reason-input" rows="3" placeholder="Nhập lý do hoàn thành hoặc không hoàn thành..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task-status')">Huỷ</button>
+      <button class="btn btn-sm" style="background:var(--blue);color:#060a10;font-weight:700;" onclick="confirmTaskStatus()">Xác Nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Task History -->
+<div class="modal-overlay" id="modal-task-history">
+  <div class="modal" style="width:600px;">
+    <div class="modal-header">
+      <div class="modal-title">📋 Lịch Sử Công Việc</div>
+      <button class="modal-close" onclick="closeModal('modal-task-history')">✕</button>
+    </div>
+    <div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;gap:8px;">
+      <select class="btn btn-ghost btn-sm" id="history-filter-status" onchange="renderTaskHistory()" style="cursor:pointer;">
+        <option value="">Tất cả trạng thái</option>
+        <option value="done">✅ Hoàn thành</option>
+        <option value="failed">❌ Không hoàn thành</option>
+        <option value="pending">⏳ Chưa làm</option>
+      </select>
+      <input type="month" class="btn btn-ghost btn-sm" id="history-filter-month" onchange="renderTaskHistory()" style="cursor:pointer;">
+    </div>
+    <div id="task-history-list" style="max-height:450px;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task-history')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modal-tx">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💸 Thêm Giao Dịch</div>
+      <button class="modal-close" onclick="closeModal('modal-tx')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Loại</label>
+        <div class="type-toggle">
+          <button class="type-btn thu selected" onclick="selectType('thu',this)">📥 Thu Nhập</button>
+          <button class="type-btn chi" onclick="selectType('chi',this)">📤 Chi Tiêu</button>
+        </div>
+      </div>
+      <input type="hidden" id="tx-type" value="thu">
+      <div class="field">
+        <label>Tên Giao Dịch</label>
+        <input type="text" id="tx-name" placeholder="VD: Lương tháng 6, Ăn sáng...">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Số Tiền (₫)</label>
+          <input type="number" id="tx-amount" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Ngày</label>
+          <input type="date" id="tx-date">
+        </div>
+      </div>
+      <div class="field">
+        <label>Danh Mục</label>
+        <select id="tx-cat">
+          <option value="Lương">💼 Lương</option>
+          <option value="Thưởng">🎁 Thưởng</option>
+          <option value="Freelance">💻 Freelance</option>
+          <option value="Khác (Thu)">💰 Khác (Thu)</option>
+          <option value="Ăn uống">🍜 Ăn uống</option>
+          <option value="Đi lại">🚗 Đi lại</option>
+          <option value="Nhà ở">🏠 Nhà ở</option>
+          <option value="Giải trí">🎬 Giải trí</option>
+          <option value="Sức khỏe">💊 Sức khỏe</option>
+          <option value="Mua sắm">🛍️ Mua sắm</option>
+          <option value="Giáo dục">📚 Giáo dục</option>
+          <option value="Khác (Chi)">💸 Khác (Chi)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-tx')">Huỷ</button>
+      <button class="btn btn-mint" onclick="saveTx()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Goal -->
+<div class="modal-overlay" id="modal-goal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🎯 Thêm Mục Tiêu Tiết Kiệm</div>
+      <button class="modal-close" onclick="closeModal('modal-goal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Tên Mục Tiêu</label><input type="text" id="goal-name" placeholder="VD: Mua xe, Du lịch Nhật..."></div>
+      <div class="field-row">
+        <div class="field"><label>Số Tiền Cần (₫)</label><input type="number" id="goal-target" placeholder="0" min="0"></div>
+        <div class="field"><label>Hiện Có (₫)</label><input type="number" id="goal-current" placeholder="0" min="0"></div>
+      </div>
+      <div class="field"><label>Hạn Đạt Được</label><input type="date" id="goal-date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-goal')">Huỷ</button>
+      <button class="btn btn-mint" onclick="saveGoal()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Reminder -->
+<div class="modal-overlay" id="modal-reminder">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🔔 Thêm Nhắc Nhở</div>
+      <button class="modal-close" onclick="closeModal('modal-reminder')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Tên Khoản</label><input type="text" id="rem-name" placeholder="VD: Tiền thuê nhà, Điện nước..."></div>
+      <div class="field-row">
+        <div class="field"><label>Số Tiền (₫)</label><input type="number" id="rem-amount" placeholder="0" min="0"></div>
+        <div class="field"><label>Ngày Hàng Tháng</label><input type="number" id="rem-day" placeholder="1-31" min="1" max="31"></div>
+      </div>
+      <div class="field">
+        <label>Loại</label>
+        <select id="rem-type">
+          <option value="expense">📤 Khoản Phải Trả</option>
+          <option value="income">📥 Khoản Sẽ Nhận</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-reminder')">Huỷ</button>
+      <button class="btn btn-mint" onclick="saveReminder()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Investment -->
+<div class="modal-overlay" id="modal-invest">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="invest-modal-title">📈 Thêm Khoản Đầu Tư</div>
+      <button class="modal-close" onclick="closeModal('modal-invest')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Tên Khoản Đầu Tư</label><input type="text" id="inv-name" placeholder="VD: VNM, Bitcoin, Vàng SJC..."></div>
+      <div class="field">
+        <label>Loại Tài Sản</label>
+        <select id="inv-type">
+          <option value="stock">📊 Chứng Khoán</option>
+          <option value="crypto">🪙 Crypto</option>
+          <option value="gold">🥇 Vàng</option>
+          <option value="saving">🏦 Tiết Kiệm / Trái Phiếu</option>
+          <option value="realestate">🏠 Bất Động Sản</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Vốn Gốc (₫)</label><input type="number" id="inv-capital" placeholder="0" min="0"></div>
+        <div class="field"><label>Giá Trị Hiện Tại (₫)</label><input type="number" id="inv-current" placeholder="0" min="0"></div>
+      </div>
+      <div class="field"><label>Ngày Đầu Tư</label><input type="date" id="inv-date"></div>
+      <div class="field"><label>Ghi Chú (tuỳ chọn)</label><textarea id="inv-note" rows="2" placeholder="Chiến lược, mục tiêu..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-invest')">Huỷ</button>
+      <button class="btn btn-gold" onclick="saveInvestment()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: History -->
+<div class="modal-overlay" id="modal-history">
+  <div class="modal" style="width:560px;">
+    <div class="modal-header">
+      <div class="modal-title">📋 Lịch Sử Giao Dịch Đầu Tư</div>
+      <button class="modal-close" onclick="closeModal('modal-history')">✕</button>
+    </div>
+    <div id="history-list" style="max-height:400px;overflow-y:auto;">
+      <div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Chưa có lịch sử</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-history')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA STORE
+// ============================================================
+let data = {
+  transactions: [],
+  goals: [],
+  reminders: [],
+  investments: [],
+  investHistory: []
+};
+
+function save() { localStorage.setItem('finvault', JSON.stringify(data)); }
+function load() {
+  const s = localStorage.getItem('finvault');
+  if(s) data = JSON.parse(s);
+}
+load();
+
+// ============================================================
+// UTILS
+// ============================================================
+const fmt = (n) => new Intl.NumberFormat('vi-VN', {style:'currency',currency:'VND',maximumFractionDigits:0}).format(n||0);
+const fmtShort = (n) => {
+  if(Math.abs(n)>=1e9) return (n/1e9).toFixed(1)+'T';
+  if(Math.abs(n)>=1e6) return (n/1e6).toFixed(1)+'M';
+  if(Math.abs(n)>=1e3) return (n/1e3).toFixed(0)+'K';
+  return n;
+};
+const today = () => new Date().toISOString().split('T')[0];
+const nowMonth = () => new Date().toISOString().slice(0,7);
+
+const catIcons = {
+  'Lương':'💼','Thưởng':'🎁','Freelance':'💻','Khác (Thu)':'💰',
+  'Ăn uống':'🍜','Đi lại':'🚗','Nhà ở':'🏠','Giải trí':'🎬',
+  'Sức khỏe':'💊','Mua sắm':'🛍️','Giáo dục':'📚','Khác (Chi)':'💸'
+};
+const catColors = {
+  'Lương':'var(--mint)','Thưởng':'var(--gold)','Freelance':'var(--blue)',
+  'Ăn uống':'var(--red)','Đi lại':'var(--purple)','Nhà ở':'var(--gold)',
+  'Giải trí':'var(--blue)','Sức khỏe':'#ff9f43','Mua sắm':'var(--red)',
+  'Giáo dục':'var(--mint)','Khác (Chi)':'var(--text3)','Khác (Thu)':'var(--text2)'
+};
+const typeLabels = { stock:'Chứng Khoán', crypto:'Crypto', gold:'Vàng', saving:'Tiết Kiệm', realestate:'Bất Động Sản' };
+const typeIcons = { stock:'📊', crypto:'🪙', gold:'🥇', saving:'🏦', realestate:'🏠' };
+const typeColors = { stock:'var(--mint)', crypto:'var(--purple)', gold:'var(--gold)', saving:'var(--blue)', realestate:'var(--red)' };
+const typeBgColors = { stock:'rgba(61,255,160,0.15)', crypto:'rgba(176,107,255,0.15)', gold:'rgba(245,200,66,0.15)', saving:'rgba(92,168,255,0.15)', realestate:'rgba(255,92,92,0.15)' };
+
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchMainTab(tab, el) {
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='finance') refreshDashboard();
+  if(tab==='invest') renderInvestments();
+}
+
+let currentSubTab = 'dashboard';
+function switchSubTab(sub, el) {
+  currentSubTab = sub;
+  document.querySelectorAll('.inner-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['dashboard','transactions','schedule'].forEach(s=>{
+    const el2 = document.getElementById('sub-'+s);
+    if(el2) el2.style.display = s===sub ? 'flex' : 'none';
+  });
+  if(sub==='dashboard') refreshDashboard();
+  if(sub==='transactions') { renderTransactions(); populateFilters(); }
+  if(sub==='schedule') { renderCalendar(); renderReminders(); checkUpcoming(); }
+}
+
+// ============================================================
+// TOPBAR DATE
+// ============================================================
+function setDate() {
+  const d = new Date();
+  const opts = {weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  document.getElementById('topbar-date').textContent = d.toLocaleDateString('vi-VN',opts);
+}
+setDate();
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function refreshDashboard() {
+  const thisMonth = nowMonth();
+  const txs = data.transactions;
+  const monthTxs = txs.filter(t=>t.date.startsWith(thisMonth));
+  const thu = monthTxs.filter(t=>t.type==='thu').reduce((a,b)=>a+b.amount,0);
+  const chi = monthTxs.filter(t=>t.type==='chi').reduce((a,b)=>a+b.amount,0);
+  const allThu = txs.filter(t=>t.type==='thu').reduce((a,b)=>a+b.amount,0);
+  const allChi = txs.filter(t=>t.type==='chi').reduce((a,b)=>a+b.amount,0);
+  const sodu = allThu - allChi;
+  const tietkiem = thu - chi;
+
+  document.getElementById('dash-sodu').textContent = fmt(sodu);
+  document.getElementById('dash-thu').textContent = fmt(thu);
+  document.getElementById('dash-chi').textContent = fmt(chi);
+  document.getElementById('dash-tietkiem').textContent = fmt(tietkiem);
+  document.getElementById('dash-tietkiem').className = 'stat-value ' + (tietkiem>=0?'':'loss');
+  document.getElementById('dash-thu-change').textContent = thu>0 ? `📥 ${monthTxs.filter(t=>t.type==='thu').length} khoản thu` : '—';
+  document.getElementById('dash-chi-change').textContent = chi>0 ? `📤 ${monthTxs.filter(t=>t.type==='chi').length} khoản chi` : '—';
+  document.getElementById('dash-tk-change').className = 'stat-change '+(tietkiem>=0?'up':'down');
+
+  renderFlowChart();
+  renderCategoryChart();
+  renderRecentTx();
+  renderGoals();
+}
+
+function renderFlowChart() {
+  const chart = document.getElementById('flow-chart');
+  const months = [];
+  for(let i=5;i>=0;i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth()-i);
+    months.push(d.toISOString().slice(0,7));
+  }
+  const maxVal = months.reduce((max,m)=>{
+    const thu = data.transactions.filter(t=>t.date.startsWith(m)&&t.type==='thu').reduce((a,b)=>a+b.amount,0);
+    const chi = data.transactions.filter(t=>t.date.startsWith(m)&&t.type==='chi').reduce((a,b)=>a+b.amount,0);
+    return Math.max(max,thu,chi);
+  },1);
+
+  chart.innerHTML = months.map(m=>{
+    const thu = data.transactions.filter(t=>t.date.startsWith(m)&&t.type==='thu').reduce((a,b)=>a+b.amount,0);
+    const chi = data.transactions.filter(t=>t.date.startsWith(m)&&t.type==='chi').reduce((a,b)=>a+b.amount,0);
+    const thH = Math.round((thu/maxVal)*100);
+    const cH = Math.round((chi/maxVal)*100);
+    const label = m.split('-')[1]+'/'+m.split('-')[0].slice(2);
+    return `<div class="bar-group">
+      <div class="bar-wrap">
+        <div class="bar bar-thu" style="height:${thH}px" title="${fmt(thu)}"></div>
+        <div class="bar bar-chi" style="height:${cH}px" title="${fmt(chi)}"></div>
+      </div>
+      <div class="bar-label">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCategoryChart() {
+  const wrap = document.getElementById('category-chart');
+  const chiTxs = data.transactions.filter(t=>t.type==='chi');
+  if(!chiTxs.length) { wrap.innerHTML='<div style="color:var(--text3);font-size:13px">Chưa có dữ liệu chi tiêu</div>'; return; }
+  const cats = {};
+  chiTxs.forEach(t=>{ cats[t.category]=(cats[t.category]||0)+t.amount; });
+  const total = Object.values(cats).reduce((a,b)=>a+b,0);
+  const sorted = Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  let deg = 0;
+  const segments = sorted.map(([cat,val])=>{
+    const pct = val/total;
+    const color = catColors[cat]||'var(--text3)';
+    const start = deg; deg += pct*360;
+    return `${color} ${start}deg ${deg}deg`;
+  });
+  wrap.innerHTML = `
+    <div class="donut" style="background:conic-gradient(${segments.join(',')})"></div>
+    <div class="donut-labels">
+      ${sorted.map(([cat,val])=>`
+        <div class="donut-item">
+          <div class="donut-dot" style="background:${catColors[cat]||'var(--text3)'}"></div>
+          <div class="donut-name">${catIcons[cat]||''} ${cat}</div>
+          <div class="donut-pct">${Math.round(val/total*100)}%</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderRecentTx() {
+  const el = document.getElementById('recent-tx-list');
+  const txs = [...data.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  if(!txs.length) { el.innerHTML='<div class="empty"><div class="empty-icon">💸</div><div class="empty-text">Chưa có giao dịch</div></div>'; return; }
+  el.innerHTML = txs.map(t=>txRow(t)).join('');
+}
+
+function txRow(t) {
+  return `<div class="tx-item">
+    <div class="tx-icon" style="background:${t.type==='thu'?'var(--mint-dim)':'var(--red-dim)'}">${catIcons[t.category]||'💰'}</div>
+    <div class="tx-info">
+      <div class="tx-name">${t.name}</div>
+      <div class="tx-cat">${t.category}</div>
+    </div>
+    <div>
+      <div class="tx-amount ${t.type==='thu'?'income':'expense'}">${t.type==='thu'?'+':'-'}${fmt(t.amount)}</div>
+      <div class="tx-date">${t.date}</div>
+    </div>
+    <button class="btn btn-danger btn-sm" onclick="deleteTx('${t.id}')">✕</button>
+  </div>`;
+}
+
+function renderGoals() {
+  const el = document.getElementById('goals-list');
+  if(!data.goals.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🎯</div><div class="empty-text">Chưa có mục tiêu nào</div></div>'; return; }
+  el.innerHTML = data.goals.map(g=>{
+    const pct = Math.min(100, Math.round(g.current/g.target*100));
+    const color = pct>=100?'mint':pct>=60?'gold':'red';
+    return `<div class="progress-wrap">
+      <div class="progress-header">
+        <div class="progress-label">🎯 ${g.name}</div>
+        <div class="progress-val">${fmt(g.current)} / ${fmt(g.target)}</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill ${color}" style="width:${pct}%"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+        <div class="progress-sub">${pct}% hoàn thành · Hạn: ${g.date}</div>
+        <button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// TRANSACTIONS
+// ============================================================
+function renderTransactions() {
+  const el = document.getElementById('tx-list');
+  let txs = [...data.transactions].sort((a,b)=>b.date.localeCompare(a.date));
+  const mf = document.getElementById('filter-month')?.value;
+  const cf = document.getElementById('filter-cat')?.value;
+  if(mf) txs = txs.filter(t=>t.date.startsWith(mf));
+  if(cf) txs = txs.filter(t=>t.category===cf);
+  if(!txs.length) { el.innerHTML='<div class="empty"><div class="empty-icon">💸</div><div class="empty-text">Không có giao dịch nào</div></div>'; return; }
+  el.innerHTML = txs.map(t=>txRow(t)).join('');
+}
+
+function populateFilters() {
+  const months = [...new Set(data.transactions.map(t=>t.date.slice(0,7)))].sort().reverse();
+  const mSel = document.getElementById('filter-month');
+  const cur = mSel.value;
+  mSel.innerHTML = '<option value="">Tất cả tháng</option>' + months.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+  const cats = [...new Set(data.transactions.map(t=>t.category))];
+  const cSel = document.getElementById('filter-cat');
+  const ccur = cSel.value;
+  cSel.innerHTML = '<option value="">Tất cả danh mục</option>' + cats.map(c=>`<option value="${c}" ${c===ccur?'selected':''}>${catIcons[c]||''} ${c}</option>`).join('');
+}
+
+function deleteTx(id) {
+  data.transactions = data.transactions.filter(t=>t.id!==id);
+  save(); renderTransactions(); refreshDashboard();
+}
+
+function deleteGoal(id) {
+  data.goals = data.goals.filter(g=>g.id!==id);
+  save(); renderGoals();
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+let calDate = new Date();
+
+function renderCalendar() {
+  const year = calDate.getFullYear(), month = calDate.getMonth();
+  document.getElementById('cal-month-label').textContent =
+    calDate.toLocaleDateString('vi-VN',{month:'long',year:'numeric'});
+
+  const first = new Date(year,month,1).getDay();
+  const days = new Date(year,month+1,0).getDate();
+  const prevDays = new Date(year,month,0).getDate();
+  const names = ['CN','T2','T3','T4','T5','T6','T7'];
+
+  const eventDays = new Set(data.reminders.map(r=>r.day));
+  const todayStr = today();
+
+  let html = names.map(n=>`<div class="cal-day-name">${n}</div>`).join('');
+  let cells = first===0?6:first-1;
+  for(let i=cells;i>0;i--) html+=`<div class="cal-day other-month">${prevDays-i+1}</div>`;
+  for(let d=1;d<=days;d++) {
+    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = ds===todayStr;
+    const hasEvent = eventDays.has(d) || data.reminders.some(r=>r.day===d);
+    html+=`<div class="cal-day ${isToday?'today':''} ${hasEvent?'has-event':''}">${d}</div>`;
+  }
+  const remaining = 42-(cells+days);
+  for(let d=1;d<=remaining;d++) html+=`<div class="cal-day other-month">${d}</div>`;
+  document.getElementById('calendar-grid').innerHTML=html;
+}
+
+function prevMonth() { calDate.setMonth(calDate.getMonth()-1); renderCalendar(); }
+function nextMonth() { calDate.setMonth(calDate.getMonth()+1); renderCalendar(); }
+
+function renderReminders() {
+  const el = document.getElementById('reminder-list');
+  if(!data.reminders.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🔔</div><div class="empty-text">Chưa có nhắc nhở nào</div></div>'; return; }
+  const sorted = [...data.reminders].sort((a,b)=>a.day-b.day);
+  el.innerHTML = sorted.map(r=>`
+    <div class="reminder-item">
+      <div class="reminder-dot" style="background:${r.rtype==='expense'?'var(--red)':'var(--mint)'}"></div>
+      <div class="reminder-info">
+        <div class="reminder-name">${r.name}</div>
+        <div class="reminder-date">Hàng tháng — Ngày ${r.day}</div>
+      </div>
+      <div class="reminder-amount" style="color:${r.rtype==='expense'?'var(--red)':'var(--mint)'}">${r.rtype==='expense'?'-':'+'}${fmt(r.amount)}</div>
+      <button class="btn btn-danger btn-sm" onclick="deleteReminder('${r.id}')">✕</button>
+    </div>`).join('');
+}
+
+function checkUpcoming() {
+  const today2 = new Date().getDate();
+  const upcoming = data.reminders.filter(r=>r.day>=today2 && r.day<=today2+7);
+  const el = document.getElementById('upcoming-alert');
+  if(!upcoming.length) { el.style.display='none'; return; }
+  el.style.display='flex';
+  el.className='alert-strip';
+  el.innerHTML=`⚠️ <strong>${upcoming.length} khoản</strong> sắp đến hạn trong 7 ngày tới: ${upcoming.map(r=>r.name).join(', ')}`;
+}
+
+function deleteReminder(id) {
+  data.reminders = data.reminders.filter(r=>r.id!==id);
+  save(); renderReminders(); renderCalendar();
+}
+
+// ============================================================
+// INVESTMENTS
+// ============================================================
+function renderInvestments() {
+  const filter = document.getElementById('invest-filter')?.value||'';
+  let invs = filter ? data.investments.filter(i=>i.itype===filter) : data.investments;
+  const tbody = document.getElementById('invest-tbody');
+
+  const totalCapital = data.investments.reduce((a,b)=>a+b.capital,0);
+  const totalCurrent = data.investments.reduce((a,b)=>a+b.current,0);
+  const pnl = totalCurrent - totalCapital;
+  const roi = totalCapital>0 ? (pnl/totalCapital*100) : 0;
+
+  document.getElementById('invest-total').textContent = fmt(totalCurrent);
+  document.getElementById('invest-capital').textContent = fmt(totalCapital);
+  document.getElementById('invest-pnl').textContent = (pnl>=0?'+':'')+fmt(pnl);
+  document.getElementById('invest-pnl').className = 'invest-mini-val '+(pnl>=0?'profit':'loss');
+  document.getElementById('invest-roi').textContent = (roi>=0?'+':'')+roi.toFixed(2)+'%';
+  document.getElementById('invest-roi').className = 'invest-mini-val '+(roi>=0?'profit':'loss');
+
+  if(!invs.length) {
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="empty-icon">📈</div><div class="empty-text">Chưa có khoản đầu tư nào</div></div></td></tr>`;
+  } else {
+    tbody.innerHTML = invs.map(inv=>{
+      const pnl2 = inv.current-inv.capital;
+      const roi2 = inv.capital>0?(pnl2/inv.capital*100):0;
+      return `<tr>
+        <td>
+          <div class="invest-name-cell">
+            <div class="invest-icon" style="background:${typeBgColors[inv.itype]}">${typeIcons[inv.itype]}</div>
+            <div>
+              <div style="font-weight:700">${inv.name}</div>
+              ${inv.note?`<div style="font-size:11px;color:var(--text3)">${inv.note}</div>`:''}
+            </div>
+          </div>
+        </td>
+        <td><span class="invest-type-badge type-${inv.itype}">${typeLabels[inv.itype]}</span></td>
+        <td class="neutral">${fmt(inv.capital)}</td>
+        <td style="font-family:var(--mono);font-weight:600">${fmt(inv.current)}</td>
+        <td class="${pnl2>=0?'profit':'loss'}">${pnl2>=0?'+':''}${fmt(pnl2)}</td>
+        <td class="${roi2>=0?'profit':'loss'}">${roi2>=0?'+':''}${roi2.toFixed(2)}%</td>
+        <td style="display:flex;gap:6px;">
+          <button class="btn btn-ghost btn-sm" onclick="editInvestment('${inv.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteInvestment('${inv.id}')">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  renderInvestDonut();
+  renderInvestPerf();
+}
+
+function renderInvestDonut() {
+  const wrap = document.getElementById('invest-donut-wrap');
+  if(!data.investments.length) { wrap.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">Chưa có dữ liệu</div>'; return; }
+  const byType = {};
+  data.investments.forEach(i=>{ byType[i.itype]=(byType[i.itype]||0)+i.current; });
+  const total = Object.values(byType).reduce((a,b)=>a+b,0)||1;
+  let deg=0;
+  const segments = Object.entries(byType).map(([t,v])=>{
+    const color = typeColors[t];
+    const start=deg; deg+=v/total*360;
+    return `${color} ${start}deg ${deg}deg`;
+  });
+  wrap.innerHTML=`
+    <div class="donut-wrap">
+      <div class="donut" style="background:conic-gradient(${segments.join(',')})"></div>
+      <div class="donut-labels">
+        ${Object.entries(byType).map(([t,v])=>`
+          <div class="donut-item">
+            <div class="donut-dot" style="background:${typeColors[t]};border-radius:3px;"></div>
+            <div class="donut-name">${typeIcons[t]} ${typeLabels[t]}</div>
+            <div class="donut-pct">${Math.round(v/total*100)}%</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderInvestPerf() {
+  const el = document.getElementById('invest-perf-list');
+  if(!data.investments.length) { el.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">Chưa có dữ liệu</div>'; return; }
+  const byType = {};
+  data.investments.forEach(i=>{
+    if(!byType[i.itype]) byType[i.itype]={capital:0,current:0};
+    byType[i.itype].capital+=i.capital;
+    byType[i.itype].current+=i.current;
+  });
+  el.innerHTML = Object.entries(byType).map(([t,v])=>{
+    const roi = v.capital>0?(v.current-v.capital)/v.capital*100:0;
+    const pnl = v.current-v.capital;
+    const pct = Math.min(100,Math.abs(roi));
+    return `<div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <div style="font-size:13px;font-weight:600;">${typeIcons[t]} ${typeLabels[t]}</div>
+        <div style="font-family:var(--mono);font-size:12px;" class="${roi>=0?'profit':'loss'}">${roi>=0?'+':''}${roi.toFixed(2)}%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${pct}%;background:${roi>=0?'linear-gradient(90deg,var(--mint),rgba(61,255,160,0.4))':'linear-gradient(90deg,var(--red),rgba(255,92,92,0.4))'}"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px;">${roi>=0?'Lãi':'Lỗ'}: ${roi>=0?'+':''}${fmt(pnl)}</div>
+    </div>`;
+  }).join('');
+}
+
+function deleteInvestment(id) {
+  const inv = data.investments.find(i=>i.id===id);
+  if(inv) {
+    data.investHistory.push({...inv, action:'delete', actionDate:today()});
+  }
+  data.investments = data.investments.filter(i=>i.id!==id);
+  save(); renderInvestments();
+}
+
+let editingInvestId = null;
+function editInvestment(id) {
+  const inv = data.investments.find(i=>i.id===id);
+  if(!inv) return;
+  editingInvestId = id;
+  document.getElementById('invest-modal-title').textContent = '✏️ Cập Nhật Khoản Đầu Tư';
+  document.getElementById('inv-name').value = inv.name;
+  document.getElementById('inv-type').value = inv.itype;
+  document.getElementById('inv-capital').value = inv.capital;
+  document.getElementById('inv-current').value = inv.current;
+  document.getElementById('inv-date').value = inv.date;
+  document.getElementById('inv-note').value = inv.note||'';
+  openModal('modal-invest');
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openTxModal() { document.getElementById('tx-date').value=today(); openModal('modal-tx'); }
+function openGoalModal() { openModal('modal-goal'); }
+function openReminderModal() { openModal('modal-reminder'); }
+function openInvestModal() {
+  editingInvestId = null;
+  document.getElementById('invest-modal-title').textContent = '📈 Thêm Khoản Đầu Tư';
+  document.getElementById('inv-name').value='';
+  document.getElementById('inv-capital').value='';
+  document.getElementById('inv-current').value='';
+  document.getElementById('inv-date').value=today();
+  document.getElementById('inv-note').value='';
+  openModal('modal-invest');
+}
+function openHistoryModal() { renderHistoryModal(); openModal('modal-history'); }
+
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+
+// ============================================================
+// SAVE ACTIONS
+// ============================================================
+function selectType(type, btn) {
+  document.getElementById('tx-type').value=type;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function saveTx() {
+  const name = document.getElementById('tx-name').value.trim();
+  const amount = parseFloat(document.getElementById('tx-amount').value);
+  const date = document.getElementById('tx-date').value;
+  const type = document.getElementById('tx-type').value;
+  const category = document.getElementById('tx-cat').value;
+  if(!name||!amount||!date) { alert('Vui lòng điền đầy đủ thông tin!'); return; }
+  data.transactions.push({id:uid(), name, amount, date, type, category});
+  save(); closeModal('modal-tx');
+  document.getElementById('tx-name').value='';
+  document.getElementById('tx-amount').value='';
+  renderTransactions(); refreshDashboard();
+}
+
+function saveGoal() {
+  const name = document.getElementById('goal-name').value.trim();
+  const target = parseFloat(document.getElementById('goal-target').value);
+  const current = parseFloat(document.getElementById('goal-current').value)||0;
+  const date = document.getElementById('goal-date').value;
+  if(!name||!target) { alert('Vui lòng điền đầy đủ!'); return; }
+  data.goals.push({id:uid(), name, target, current, date});
+  save(); closeModal('modal-goal');
+  renderGoals();
+}
+
+function saveReminder() {
+  const name = document.getElementById('rem-name').value.trim();
+  const amount = parseFloat(document.getElementById('rem-amount').value);
+  const day = parseInt(document.getElementById('rem-day').value);
+  const rtype = document.getElementById('rem-type').value;
+  if(!name||!amount||!day) { alert('Vui lòng điền đầy đủ!'); return; }
+  data.reminders.push({id:uid(), name, amount, day, rtype});
+  save(); closeModal('modal-reminder');
+  renderReminders(); renderCalendar(); checkUpcoming();
+}
+
+function saveInvestment() {
+  const name = document.getElementById('inv-name').value.trim();
+  const itype = document.getElementById('inv-type').value;
+  const capital = parseFloat(document.getElementById('inv-capital').value);
+  const current = parseFloat(document.getElementById('inv-current').value);
+  const date = document.getElementById('inv-date').value;
+  const note = document.getElementById('inv-note').value.trim();
+  if(!name||!capital||!current) { alert('Vui lòng điền đầy đủ!'); return; }
+
+  if(editingInvestId) {
+    const idx = data.investments.findIndex(i=>i.id===editingInvestId);
+    if(idx!==-1) {
+      data.investHistory.push({...data.investments[idx], action:'update', actionDate:today()});
+      data.investments[idx] = {...data.investments[idx], name, itype, capital, current, date, note};
+    }
+  } else {
+    data.investments.push({id:uid(), name, itype, capital, current, date, note});
+    data.investHistory.push({id:uid(), name, itype, capital, current, date, note, action:'buy', actionDate:today()});
+  }
+  save(); closeModal('modal-invest'); editingInvestId=null;
+  renderInvestments();
+}
+
+function renderHistoryModal() {
+  const el = document.getElementById('history-list');
+  const hist = [...data.investHistory].reverse();
+  if(!hist.length) { el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Chưa có lịch sử</div></div>'; return; }
+  const actionMap = {buy:'h-buy',update:'h-update',delete:'h-sell',sell:'h-sell'};
+  const actionLabel = {buy:'MUA',update:'CẬP NHẬT',delete:'XOÁ',sell:'BÁN'};
+  el.innerHTML = hist.map(h=>`
+    <div class="history-item">
+      <span class="history-type ${actionMap[h.action]||'h-update'}">${actionLabel[h.action]||h.action}</span>
+      <div>
+        <div class="history-name">${typeIcons[h.itype]} ${h.name}</div>
+        <div class="history-detail">${h.actionDate}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="history-val neutral">${fmt(h.capital)}</div>
+        <div class="history-detail">Vốn gốc</div>
+      </div>
+    </div>`).join('');
+}
+
+
+// ============================================================
+// TASK MODULE
+// ============================================================
+let taskCurrentDate = today();
+let statusTargetId = null;
+
+function taskDateStr(d) {
+  const date = new Date(d + 'T00:00:00');
+  const days = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+  return {
+    label: days[date.getDay()] + ', ' + date.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}),
+    isToday: d === today()
+  };
+}
+
+function renderTaskPage() {
+  const info = taskDateStr(taskCurrentDate);
+  document.getElementById('task-date-label').textContent = info.label;
+  document.getElementById('task-date-sub').textContent = info.isToday ? '📍 Hôm nay' : '';
+
+  const dayTasks = data.tasks ? data.tasks.filter(t => t.date === taskCurrentDate) : [];
+  const done = dayTasks.filter(t=>t.status==='done').length;
+  const failed = dayTasks.filter(t=>t.status==='failed').length;
+  const pending = dayTasks.filter(t=>t.status==='pending').length;
+  const total = dayTasks.length;
+  const rate = total>0 ? Math.round(done/total*100) : null;
+
+  document.getElementById('ts-total').textContent = total;
+  document.getElementById('ts-done').textContent = done;
+  document.getElementById('ts-pending').textContent = pending;
+  document.getElementById('ts-failed').textContent = failed;
+  document.getElementById('ts-rate').textContent = rate !== null ? rate+'%' : '—';
+
+  // sort by time
+  const sorted = [...dayTasks].sort((a,b)=>(a.timeStart||'').localeCompare(b.timeStart||''));
+
+  const listEl = document.getElementById('task-list');
+  if(!sorted.length) {
+    listEl.innerHTML = `<div class="empty" style="padding:48px 20px;"><div class="empty-icon">✅</div><div class="empty-text">Không có task nào. Thêm công việc cho ngày này!</div></div>`;
+  } else {
+    listEl.innerHTML = sorted.map(t => taskItemHTML(t)).join('');
+  }
+
+  renderWeeklyOverview();
+}
+
+function taskItemHTML(t) {
+  const priClass = {high:'pri-high',med:'pri-med',low:'pri-low'}[t.priority]||'pri-med';
+  const priLabel = {high:'🔴 Cao',med:'🟡 Trung Bình',low:'🟢 Thấp'}[t.priority]||'';
+  const checkIcon = t.status==='done' ? '✓' : t.status==='failed' ? '✕' : '';
+  const nameClass = t.status==='done' ? 'task-name done-text' : 'task-name';
+  const timeStr = t.timeStart ? `${t.timeStart}${t.timeEnd?' – '+t.timeEnd:''}` : '';
+
+  const reasonHTML = (t.status==='done'||t.status==='failed') && t.reason
+    ? `<div class="task-reason ${t.status}">💬 ${t.reason}</div>` : '';
+
+  return `<div class="task-item" id="titem-${t.id}">
+    <div class="task-main">
+      <button class="task-check ${t.status}" onclick="openStatusModal('${t.id}')">${checkIcon}</button>
+      <div class="task-body" onclick="toggleTaskDetail('${t.id}')">
+        <div class="${nameClass}">${t.name}</div>
+        <div class="task-meta">
+          ${timeStr?`<span class="task-time">⏰ ${timeStr}</span>`:''}
+          <span class="task-priority ${priClass}">${priLabel}</span>
+          ${t.status==='pending'?'<span class="badge badge-gold">⏳ Chưa làm</span>':t.status==='done'?'<span class="badge badge-mint">✅ Xong</span>':'<span class="badge badge-red">❌ Không xong</span>'}
+        </div>
+        ${t.content?`<div class="task-content-preview">📝 ${t.content}</div>`:''}
+        ${reasonHTML}
+      </div>
+      <button class="task-expand-btn" onclick="toggleTaskDetail('${t.id}')" title="Xem chi tiết">⋯</button>
+    </div>
+    <div class="task-detail" id="tdetail-${t.id}">
+      ${t.content?`<div class="task-detail-content">${t.content}</div>`:'<div style="color:var(--text3);font-size:13px;">Không có nội dung chi tiết.</div>'}
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-ghost btn-sm" onclick="openStatusModal('${t.id}')">🔄 Đổi Trạng Thái</button>
+        <button class="btn btn-ghost btn-sm" onclick="editTask('${t.id}')">✏️ Sửa</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}')">🗑️ Xoá</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleTaskDetail(id) {
+  const el = document.getElementById('tdetail-'+id);
+  if(el) el.classList.toggle('open');
+}
+
+function taskPrevDay() {
+  const d = new Date(taskCurrentDate+'T00:00:00');
+  d.setDate(d.getDate()-1);
+  taskCurrentDate = d.toISOString().split('T')[0];
+  renderTaskPage();
+}
+function taskNextDay() {
+  const d = new Date(taskCurrentDate+'T00:00:00');
+  d.setDate(d.getDate()+1);
+  taskCurrentDate = d.toISOString().split('T')[0];
+  renderTaskPage();
+}
+function taskGoToday() { taskCurrentDate = today(); renderTaskPage(); }
+
+function renderWeeklyOverview() {
+  const el = document.getElementById('weekly-overview');
+  const days = [];
+  for(let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  const dayNames = ['CN','T2','T3','T4','T5','T6','T7'];
+  el.innerHTML = days.map(d=>{
+    const tasks = (data.tasks||[]).filter(t=>t.date===d);
+    const done = tasks.filter(t=>t.status==='done').length;
+    const total = tasks.length;
+    const failed = tasks.filter(t=>t.status==='failed').length;
+    const date = new Date(d+'T00:00:00');
+    const isToday = d===today();
+    const isSel = d===taskCurrentDate;
+    let color = 'var(--border)';
+    if(total>0) color = failed>0 ? 'var(--red)' : done===total ? 'var(--mint)' : 'var(--gold)';
+    return `<div onclick="taskCurrentDate='${d}';renderTaskPage();" style="cursor:pointer;text-align:center;padding:12px 14px;border-radius:12px;border:1px solid ${isSel?'var(--blue)':'var(--border)'};background:${isSel?'var(--blue-dim)':'var(--s2)'};min-width:70px;transition:all 0.2s;">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;">${dayNames[date.getDay()]}</div>
+      <div style="font-size:13px;font-weight:700;color:${isToday?'var(--blue)':'var(--text)'};">${date.getDate()}</div>
+      <div style="width:8px;height:8px;border-radius:50%;background:${color};margin:6px auto 4px;"></div>
+      <div style="font-size:10px;color:var(--text3);">${total>0?done+'/'+total:'—'}</div>
+    </div>`;
+  }).join('');
+}
+
+// Status modal
+function openStatusModal(id) {
+  statusTargetId = id;
+  const t = (data.tasks||[]).find(t=>t.id===id);
+  if(!t) return;
+  document.getElementById('status-modal-title').textContent = `🔄 Trạng Thái: ${t.name}`;
+  document.getElementById('task-reason-input').value = t.reason||'';
+  // reset buttons
+  document.getElementById('status-btn-done').classList.remove('selected');
+  document.getElementById('status-btn-failed').classList.remove('selected');
+  if(t.status==='done') document.getElementById('status-btn-done').classList.add('selected');
+  else if(t.status==='failed') document.getElementById('status-btn-failed').classList.add('selected');
+  document.getElementById('status-value').value = t.status==='pending'?'done':t.status;
+  openModal('modal-task-status');
+}
+
+function selectStatus(val) {
+  document.getElementById('status-value').value = val;
+  document.getElementById('status-btn-done').classList.toggle('selected', val==='done');
+  document.getElementById('status-btn-failed').classList.toggle('selected', val==='failed');
+  document.getElementById('status-reason-label').textContent = val==='done' ? '🎉 Ghi Chú (tuỳ chọn)' : '⚠️ Lý Do Không Hoàn Thành';
+}
+
+function confirmTaskStatus() {
+  const status = document.getElementById('status-value').value;
+  const reason = document.getElementById('task-reason-input').value.trim();
+  if(!data.tasks) data.tasks=[];
+  const idx = data.tasks.findIndex(t=>t.id===statusTargetId);
+  if(idx!==-1) { data.tasks[idx].status=status; data.tasks[idx].reason=reason; }
+  save(); closeModal('modal-task-status'); renderTaskPage();
+}
+
+// Add / edit task
+let editingTaskId = null;
+function openTaskModal() {
+  editingTaskId = null;
+  document.getElementById('task-modal-title').textContent = '✅ Thêm Task Công Việc';
+  document.getElementById('task-name').value='';
+  document.getElementById('task-time-start').value='';
+  document.getElementById('task-time-end').value='';
+  document.getElementById('task-date-input').value=taskCurrentDate;
+  document.getElementById('task-priority').value='med';
+  document.getElementById('task-content').value='';
+  openModal('modal-task');
+}
+
+function editTask(id) {
+  const t = (data.tasks||[]).find(t=>t.id===id);
+  if(!t) return;
+  editingTaskId = id;
+  document.getElementById('task-modal-title').textContent = '✏️ Sửa Task';
+  document.getElementById('task-name').value=t.name;
+  document.getElementById('task-time-start').value=t.timeStart||'';
+  document.getElementById('task-time-end').value=t.timeEnd||'';
+  document.getElementById('task-date-input').value=t.date;
+  document.getElementById('task-priority').value=t.priority||'med';
+  document.getElementById('task-content').value=t.content||'';
+  openModal('modal-task');
+}
+
+function saveTask() {
+  const name = document.getElementById('task-name').value.trim();
+  const timeStart = document.getElementById('task-time-start').value;
+  const timeEnd = document.getElementById('task-time-end').value;
+  const date = document.getElementById('task-date-input').value;
+  const priority = document.getElementById('task-priority').value;
+  const content = document.getElementById('task-content').value.trim();
+  if(!name) { alert('Vui lòng nhập tên công việc!'); return; }
+  if(!data.tasks) data.tasks=[];
+  if(editingTaskId) {
+    const idx = data.tasks.findIndex(t=>t.id===editingTaskId);
+    if(idx!==-1) data.tasks[idx]={...data.tasks[idx],name,timeStart,timeEnd,date,priority,content};
+  } else {
+    data.tasks.push({id:uid(),name,timeStart,timeEnd,date,priority,content,status:'pending',reason:''});
+  }
+  // update taskCurrentDate to task's date so user sees it
+  taskCurrentDate = date;
+  save(); closeModal('modal-task'); renderTaskPage();
+}
+
+function deleteTask(id) {
+  if(!confirm('Xoá task này?')) return;
+  data.tasks = (data.tasks||[]).filter(t=>t.id!==id);
+  save(); renderTaskPage();
+}
+
+// History
+function openTaskHistoryModal() {
+  document.getElementById('history-filter-month').value = nowMonth();
+  renderTaskHistory();
+  openModal('modal-task-history');
+}
+
+function renderTaskHistory() {
+  const statusFilter = document.getElementById('history-filter-status').value;
+  const monthFilter = document.getElementById('history-filter-month').value;
+  let tasks = [...(data.tasks||[])];
+  if(statusFilter) tasks = tasks.filter(t=>t.status===statusFilter);
+  if(monthFilter) tasks = tasks.filter(t=>t.date.startsWith(monthFilter));
+  tasks.sort((a,b)=>b.date.localeCompare(a.date)||(b.timeStart||'').localeCompare(a.timeStart||''));
+  const el = document.getElementById('task-history-list');
+  if(!tasks.length) { el.innerHTML='<div class="empty" style="padding:32px;"><div class="empty-icon">📋</div><div class="empty-text">Không có task nào</div></div>'; return; }
+  const statusBadge = {done:'<span class="badge badge-mint">✅ Xong</span>',failed:'<span class="badge badge-red">❌ Không xong</span>',pending:'<span class="badge badge-gold">⏳ Chưa làm</span>'};
+  el.innerHTML = tasks.map(t=>`
+    <div class="task-item">
+      <div class="task-main" style="padding:12px 20px;">
+        <div class="task-body">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div class="task-name ${t.status==='done'?'done-text':''}">${t.name}</div>
+            ${statusBadge[t.status]||''}
+          </div>
+          <div class="task-meta">
+            <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">📅 ${t.date}</span>
+            ${t.timeStart?`<span class="task-time">⏰ ${t.timeStart}${t.timeEnd?' – '+t.timeEnd:''}</span>`:''}
+            <span class="task-priority ${{high:'pri-high',med:'pri-med',low:'pri-low'}[t.priority]||'pri-med'}">${{high:'🔴 Cao',med:'🟡 TB',low:'🟢 Thấp'}[t.priority]||''}</span>
+          </div>
+          ${t.reason?`<div class="task-reason ${t.status}" style="margin-top:6px;">💬 ${t.reason}</div>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// Update switchMainTab to include task
+const _origSwitchMainTab = switchMainTab;
+// override
+function switchMainTab(tab, el) {
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='finance') refreshDashboard();
+  if(tab==='invest') renderInvestments();
+  if(tab==='task') { if(!data.tasks) data.tasks=[]; renderTaskPage(); }
+}
+
+// Init task data
+if(!data.tasks) data.tasks=[];
+
+document.getElementById('sub-transactions').style.display='none';
+document.getElementById('sub-schedule').style.display='none';
+refreshDashboard();
+renderCalendar();
+</script>
+</body>
+</html>
