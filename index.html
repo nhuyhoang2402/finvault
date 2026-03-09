@@ -309,22 +309,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   .disc-header{grid-template-columns:repeat(3,1fr);}
 }
 </style>
-<style>
-.sb-bar{position:fixed;bottom:0;left:0;right:0;z-index:9999;height:24px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;font-family:var(--mono);letter-spacing:.4px;transition:all .4s;}
-.sb-loading{background:rgba(92,168,255,.08);color:var(--blue);border-top:1px solid rgba(92,168,255,.15);}
-.sb-ok{background:rgba(61,255,160,.05);color:var(--mint);border-top:1px solid rgba(61,255,160,.1);}
-.sb-warn{background:rgba(245,200,66,.06);color:var(--gold);border-top:1px solid rgba(245,200,66,.12);}
-.sb-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
-.sb-loading .sb-dot{animation:sbpulse 1s infinite;}
-@keyframes sbpulse{0%,100%{opacity:1}50%{opacity:.15}}
-/* bottom padding to not overlap content */
-.main-content{padding-bottom:28px;}
-</style>
-
 </head>
 <body>
-<div id="sb-status" class="sb-bar sb-loading"><span class="sb-dot"></span>Đang kết nối Supabase...</div>
-
 <div class="glow-a"></div><div class="glow-b"></div>
 
 <!-- TOPBAR -->
@@ -384,7 +370,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
           <div style="display:flex;gap:5px;align-items:center;">
             <button class="cnav" onclick="tPrev()">‹</button>
             <button class="cnav" onclick="tNext()">›</button>
-            <button class="btn bgh" style="padding:3px 8px;font-size:10px;" onclick="tToday()">HN</button>
+            <button class="btn bgh" style="padding:3px 8px;font-size:10px;" onclick="tToday()">Hôm nay</button>
             <button class="btn bb" style="padding:4px 9px;font-size:11px;" onclick="openTaskModal()">+</button>
           </div>
         </div>
@@ -794,115 +780,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 <script>
 // ════════════════════════════════════════
-// ════════════════════════════════════════
-// SUPABASE CONFIG
-// ════════════════════════════════════════
-const SB_URL = 'https://vfmredkgvhqibrehzrdi.supabase.co';
-const SB_KEY = 'sb_publishable_VTY_-EFduaEmZrrkkFHbvg_liLLAPYh';
-let SB_OK = false;
-
-async function sbFetch(table, method='GET', body=null, qs=''){
-  const res = await fetch(`${SB_URL}/rest/v1/${table}${qs}`, {
-    method,
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': method==='POST' ? 'return=representation' : 'return=minimal'
-    },
-    body: body ? JSON.stringify(body) : null
-  });
-  if(!res.ok){ const e=await res.text(); throw new Error(e); }
-  return method==='GET' ? res.json() : null;
-}
-
-function setSBStatus(state, msg){
-  const bar = document.getElementById('sb-status');
-  if(!bar) return;
-  bar.className = 'sb-bar sb-'+state;
-  bar.innerHTML = `<span class="sb-dot"></span>${msg}`;
-}
-
-async function sbInit(){
-  setSBStatus('loading','Đang kết nối Supabase...');
-  try {
-    // Load tất cả dữ liệu song song
-    const [txs, tasks, scheds, evts, invs, invH, habits, ckins] = await Promise.all([
-      sbFetch('transactions','GET',null,'?select=*&order=date.desc'),
-      sbFetch('tasks','GET',null,'?select=*&order=date.desc'),
-      sbFetch('schedules','GET',null,'?select=*'),
-      sbFetch('calendar_events','GET',null,'?select=*&order=date.asc'),
-      sbFetch('investments','GET',null,'?select=*'),
-      sbFetch('invest_history','GET',null,'?select=*&order=action_date.desc'),
-      sbFetch('habits','GET',null,'?select=*'),
-      sbFetch('daily_checkins','GET',null,'?select=*&order=date.desc'),
-    ]);
-
-    // Map về cấu trúc D (giữ tương thích với code cũ)
-    D.transactions = txs.map(r=>({id:r.id,name:r.name,amount:r.amount,date:r.date,type:r.type,category:r.category}));
-
-    D.tasks = tasks.map(r=>({id:r.id,name:r.name,time:r.time_start||'',priority:r.priority,content:r.content||'',date:r.date,status:r.status,reason:r.reason||''}));
-
-    D.schedules = scheds.map(r=>({id:r.id,name:r.name,start:r.time_start,end:r.time_end,color:r.color,repeat:r.repeat_type,days:r.repeat_days||[],onceDate:r.once_date}));
-
-    D.events = evts.map(r=>({id:r.id,date:r.date,name:r.name,start:r.time_start,end:r.time_end,desc:r.description||''}));
-
-    D.investments = invs.map(r=>({id:r.id,nm:r.name,itype:r.itype,cap:r.capital,cur:r.current,date:r.date,note:r.note||'',rate:r.rate||0}));
-
-    D.investHistory = invH.map(r=>({id:r.id,nm:r.name,itype:r.itype,cap:r.capital,cur:r.current,action:r.action,aDate:r.action_date}));
-
-    D.habits = habits.map(r=>({id:r.id,nm:r.name,icon:r.icon,unit:r.unit,target:r.target_value,color:r.color||'#b87fff'}));
-
-    // checkins: object {date: {wake, note, score, habits:{}}}
-    // Lấy thêm habit_logs để map vào checkins
-    const hlogs = await sbFetch('habit_logs','GET',null,'?select=*');
-    D.checkins = {};
-    ckins.forEach(c=>{
-      D.checkins[c.date] = {
-        wake: c.wake_time||'',
-        note: c.notes||'',
-        score: c.score||0,
-        habits: {}
-      };
-    });
-    hlogs.forEach(l=>{
-      if(!D.checkins[l.date]) D.checkins[l.date]={wake:'',note:'',habits:{}};
-      D.checkins[l.date].habits[l.habit_id] = l.actual_value||0;
-    });
-
-    SB_OK = true;
-    save(); // backup sang localStorage
-    setSBStatus('ok','✓ Đã kết nối Supabase');
-    setTimeout(()=>{ const b=document.getElementById('sb-status'); if(b) b.style.opacity='.5'; }, 3000);
-    refreshAll();
-
-  } catch(e) {
-    console.warn('Supabase lỗi, dùng localStorage:', e.message);
-    load(); // fallback localStorage
-    setSBStatus('warn','⚡ Offline — dùng dữ liệu local');
-    refreshAll();
-  }
-}
-
-// Sync lên Supabase (không chặn UI)
-async function sbSave(table, rec, isNew=true){
-  if(!SB_OK) return;
-  try {
-    if(isNew) await sbFetch(table,'POST',rec);
-    else {
-      const id = rec.id; const b={...rec}; delete b.id;
-      await sbFetch(table,'PATCH',b,`?id=eq.${id}`);
-    }
-  } catch(e){ console.warn('Sync lỗi:',e.message); }
-}
-async function sbDel(table, id){
-  if(!SB_OK) return;
-  try { await sbFetch(table,'DELETE',null,`?id=eq.${id}`); }
-  catch(e){ console.warn('Del lỗi:',e.message); }
-}
-
-// ════════════════════════════════════════
-// DATA STORE (localStorage backup)
+// DATA STORE
 // ════════════════════════════════════════
 let D = {
   transactions:[], tasks:[], schedules:[], events:[],
@@ -984,8 +862,8 @@ function renderOverview(){
 // TIMELINE
 // ════════════════════════════════════════
 let sDate=today();
-function sPrev(){ const d=new Date(sDate+'T00:00:00'); d.setDate(d.getDate()-1); sDate=d.toISOString().split('T')[0]; renderTimeline(); }
-function sNext(){ const d=new Date(sDate+'T00:00:00'); d.setDate(d.getDate()+1); sDate=d.toISOString().split('T')[0]; renderTimeline(); }
+function sPrev(){ sDate=dateShift(sDate,-1); renderTimeline(); }
+function sNext(){ sDate=dateShift(sDate,+1); renderTimeline(); }
 function sToday(){ sDate=today(); renderTimeline(); }
 function getSchedsFor(ds){
   const dow=new Date(ds+'T00:00:00').getDay();
@@ -1029,16 +907,21 @@ function saveSched(){
   if(s.repeat==='once') s.onceDate=document.getElementById('sc-once-date').value;
   D.schedules.push(s); save(); closeModal('mo-sched');
   document.getElementById('sc-name').value=''; renderTimeline();
-  sbSave('schedules',{id:s.id,name:s.name,time_start:s.start,time_end:s.end||'',color:s.color,repeat_type:s.repeat,repeat_days:s.days||[],once_date:s.onceDate||null});
 }
-function deleteS(id){ D.schedules=D.schedules.filter(s=>s.id!==id); save(); renderTimeline(); sbDel('schedules',id); }
+function deleteS(id){ D.schedules=D.schedules.filter(s=>s.id!==id); save(); renderTimeline(); }
 
 // ════════════════════════════════════════
 // TASK BOX
 // ════════════════════════════════════════
 let tDate=today();
-function tPrev(){ const d=new Date(tDate+'T00:00:00'); d.setDate(d.getDate()-1); tDate=d.toISOString().split('T')[0]; renderTaskBox(); }
-function tNext(){ const d=new Date(tDate+'T00:00:00'); d.setDate(d.getDate()+1); tDate=d.toISOString().split('T')[0]; renderTaskBox(); }
+// dateShift: cộng/trừ ngày an toàn, không bị lỗi timezone
+function dateShift(ds, delta){
+  const [y,m,d] = ds.split('-').map(Number);
+  const dt = new Date(y, m-1, d+delta);
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+}
+function tPrev(){ tDate=dateShift(tDate,-1); renderTaskBox(); }
+function tNext(){ tDate=dateShift(tDate,+1); renderTaskBox(); }
 function tToday(){ tDate=today(); renderTaskBox(); }
 
 function calcScore(ds){
@@ -1097,14 +980,14 @@ function renderTaskBox(){
       <span style="width:5px;height:5px;border-radius:50%;background:${priC[t.priority]||'var(--text3)'};display:inline-block;flex-shrink:0;"></span>${t.name}
     </div></td>
     <td class="ttime">${t.time||'—'}</td>
-    <td><input class="rin" style="width:90px;" value="${t.reason||''}" placeholder="Lý do..." ${isPast?'disabled':''} onchange="const _t=D.tasks.find(x=>x.id==='${t.id}');if(_t){_t.reason=this.value;save();sbSave('tasks',{id:_t.id,name:_t.name,time_start:_t.time||'',time_end:'',date:_t.date,priority:_t.priority,status:_t.status,reason:_t.reason,content:_t.content||''},false);}"></td>
+    <td><input class="rin" style="width:90px;" value="${t.reason||''}" placeholder="Lý do..." ${isPast?'disabled':''} onchange="D.tasks.find(x=>x.id==='${t.id}').reason=this.value;save();"></td>
     <td><div class="sbts">
       ${!isPast?`<button class="sbtn ${t.status==='done'?'ad':''}" onclick="setSt('${t.id}','done')" title="Xong">✅</button>
       <button class="sbtn ${t.status==='failed'?'af':''}" onclick="setSt('${t.id}','failed')" title="Không xong">❌</button>
       <button class="sbtn ${t.status==='skip'?'as':''}" onclick="setSt('${t.id}','skip')" title="Bỏ qua">⏭️</button>`
       :`<span class="sbadge ${rank.cls}" style="font-size:9px;">${t.status==='done'?'✅':t.status==='failed'?'❌':t.status==='skip'?'⏭️':'⏳'}</span>`}
     </div></td>
-    <td>${!isPast?`<button class="btn brd bxs" onclick="D.tasks=D.tasks.filter(x=>x.id!=='${t.id}');save();sbDel('tasks','${t.id}');renderTaskBox();">✕</button>`:''}</td>
+    <td>${!isPast?`<button class="btn brd bxs" onclick="D.tasks=D.tasks.filter(x=>x.id!=='${t.id}');save();renderTaskBox();">✕</button>`:''}</td>
   </tr>`).join('');
   box.innerHTML=`<div style="overflow-x:auto;"><table class="ttbl"><thead><tr><th>#</th><th>Công Việc</th><th>Giờ</th><th>Lý Do</th><th>Trạng Thái</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
   sumEl.style.display='flex';
@@ -1114,7 +997,7 @@ function renderTaskBox(){
       <span class="streak-b">🔥${calcStreak()}</span>
     </div>`;
 }
-function setSt(id,st){ const t=D.tasks.find(x=>x.id===id); if(t){ t.status=t.status===st?'pending':st; save(); sbSave('tasks',{id:t.id,name:t.name,time_start:t.time||'',time_end:'',date:t.date,priority:t.priority,status:t.status,reason:t.reason||'',content:t.content||''},false); } renderTaskBox(); updateStreak(); }
+function setSt(id,st){ const t=D.tasks.find(x=>x.id===id); if(t){ t.status=t.status===st?'pending':st; } save(); renderTaskBox(); updateStreak(); }
 let editingTask=null;
 function openTaskModal(){ editingTask=null; document.getElementById('tk-date').value=tDate; document.getElementById('tk-name').value=''; document.getElementById('tk-content').value=''; openModal('mo-task'); }
 function saveTask(){
@@ -1123,7 +1006,6 @@ function saveTask(){
   const obj={id:uid(),name,time:document.getElementById('tk-time').value,priority:document.getElementById('tk-pri').value,content:document.getElementById('tk-content').value.trim(),date:document.getElementById('tk-date').value,status:'pending',reason:''};
   D.tasks.push(obj); save(); closeModal('mo-task');
   tDate=obj.date; renderTaskBox();
-  sbSave('tasks',{id:obj.id,name:obj.name,time_start:obj.time||'',time_end:'',date:obj.date,priority:obj.priority,status:obj.status,reason:obj.reason||'',content:obj.content||''});
 }
 
 // ════════════════════════════════════════
@@ -1133,11 +1015,9 @@ function selTxType(t,btn){ document.getElementById('tx-type-v').value=t; documen
 function saveTx(){
   const name=document.getElementById('tx-nm').value.trim(), amount=parseFloat(document.getElementById('tx-amt').value), date=document.getElementById('tx-dt').value;
   if(!name||!amount||!date){ alert('Điền đủ thông tin!'); return; }
-  const txObj={id:uid(),name,amount,date,type:document.getElementById('tx-type-v').value,category:document.getElementById('tx-cat').value};
-  D.transactions.push(txObj);
+  D.transactions.push({id:uid(),name,amount,date,type:document.getElementById('tx-type-v').value,category:document.getElementById('tx-cat').value});
   save(); closeModal('mo-tx'); document.getElementById('tx-nm').value=''; document.getElementById('tx-amt').value='';
   renderTxs(); renderCharts(); renderOverview();
-  sbSave('transactions',{id:txObj.id,name:txObj.name,amount:txObj.amount,date:txObj.date,type:txObj.type,category:txObj.category});
 }
 function populateTxFilters(){
   const ms=[...new Set(D.transactions.map(t=>t.date.slice(0,7)))].sort().reverse();
@@ -1174,7 +1054,7 @@ function renderTxs(){
       html+=`<div class="txi"><div class="txic" style="background:${t.type==='thu'?'var(--mint-dim)':'var(--red-dim)'}">${CATI[t.category]||'💰'}</div>
         <div class="txin"><div class="txname">${t.name}</div><div class="txcat">${t.category}</div></div>
         <div class="txamt ${t.type==='thu'?'inc':'exp'}">${t.type==='thu'?'+':'-'}${fmt(t.amount)}</div>
-        <button class="btn brd bxs" onclick="D.transactions=D.transactions.filter(x=>x.id!=='${t.id}');save();sbDel('transactions','${t.id}');renderTxs();renderCharts();renderOverview();">✕</button>
+        <button class="btn brd bxs" onclick="D.transactions=D.transactions.filter(x=>x.id!=='${t.id}');save();renderTxs();renderCharts();renderOverview();">✕</button>
       </div>`;
     });
   });
@@ -1236,7 +1116,7 @@ function renderCalDetail(ds){
     <div class="ev-tm">⏰ ${e.st||''}${e.en?' – '+e.en:''}</div>
     <div class="ev-nm">${e.nm}</div>
     ${e.ds?`<div class="ev-ds">${e.ds}</div>`:''}
-    <button class="btn brd bxs" style="margin-top:5px;" onclick="D.events=D.events.filter(x=>x.id!=='${e.id}');save();sbDel('calendar_events','${e.id}');renderCalDetail('${ds}');renderCal();">🗑️ Xoá</button>
+    <button class="btn brd bxs" style="margin-top:5px;" onclick="D.events=D.events.filter(x=>x.id!=='${e.id}');save();renderCalDetail('${ds}');renderCal();">🗑️ Xoá</button>
   </div>`).join('');
 }
 function openEvModal(){ if(selCalDate) document.getElementById('ev-dt').value=selCalDate; openModal('mo-event'); }
@@ -1244,10 +1124,8 @@ function openEvModalForDate(){ openEvModal(); }
 function saveEvent(){
   const date=document.getElementById('ev-dt').value, nm=document.getElementById('ev-nm').value.trim();
   if(!date||!nm){ alert('Nhập ngày và tên!'); return; }
-  const evObj={id:uid(),date,nm,st:document.getElementById('ev-st').value,en:document.getElementById('ev-en').value,ds:document.getElementById('ev-ds').value.trim(),color:document.getElementById('ev-col').value};
-  D.events.push(evObj);
+  D.events.push({id:uid(),date,nm,st:document.getElementById('ev-st').value,en:document.getElementById('ev-en').value,ds:document.getElementById('ev-ds').value.trim(),color:document.getElementById('ev-col').value});
   save(); closeModal('mo-event'); document.getElementById('ev-nm').value=''; selCalDate=date; renderCal();
-  sbSave('calendar_events',{id:evObj.id,date:evObj.date,name:evObj.nm,time_start:evObj.st||'',time_end:evObj.en||'',description:evObj.ds||''});
 }
 
 // ════════════════════════════════════════
@@ -1329,10 +1207,7 @@ function saveInvest(){
   const obj={id:uid(),nm,itype:document.getElementById('inv-type').value,cap,cur,date:document.getElementById('inv-dt').value,note:document.getElementById('inv-note').value.trim()};
   if(editingInv){ const idx=D.investments.findIndex(x=>x.id===editingInv); if(idx!==-1){ D.investHistory.push({...D.investments[idx],action:'update',aDate:today()}); D.investments[idx]=obj; } }
   else{ D.investments.push(obj); D.investHistory.push({...obj,action:'buy',aDate:today()}); }
-  save(); closeModal('mo-invest');
-  if(editingInv) sbSave('investments',{id:obj.id,name:obj.nm,itype:obj.itype,capital:obj.cap,current:obj.cur,date:obj.date,note:obj.note||'',rate:obj.rate||0},false);
-  else { sbSave('investments',{id:obj.id,name:obj.nm,itype:obj.itype,capital:obj.cap,current:obj.cur,date:obj.date,note:obj.note||'',rate:obj.rate||0}); sbSave('invest_history',{id:uid(),name:obj.nm,itype:obj.itype,capital:obj.cap,current:obj.cur,action:'buy',action_date:today()}); }
-  editingInv=null; renderInvest();
+  save(); closeModal('mo-invest'); editingInv=null; renderInvest();
 }
 function renderInvest(){
   const f=document.getElementById('inv-filter')?.value||'';
@@ -1367,7 +1242,7 @@ function renderInvest(){
   renderInvDonut(); renderInvPerf();
 }
 function editInv(id){ const inv=D.investments.find(x=>x.id===id); if(!inv) return; editingInv=id; document.getElementById('inv-modal-title').textContent='✏️ Cập Nhật'; document.getElementById('inv-nm').value=inv.nm; document.getElementById('inv-type').value=inv.itype; document.getElementById('inv-cap-inp').value=inv.cap; document.getElementById('inv-cur-inp').value=inv.cur; document.getElementById('inv-dt').value=inv.date; document.getElementById('inv-note').value=inv.note||''; openModal('mo-invest'); }
-function delInv(id){ const inv=D.investments.find(x=>x.id===id); if(inv){ D.investHistory.push({...inv,action:'delete',aDate:today()}); sbSave('invest_history',{id:uid(),name:inv.nm,itype:inv.itype,capital:inv.cap,current:inv.cur,action:'delete',action_date:today()}); } D.investments=D.investments.filter(x=>x.id!==id); save(); sbDel('investments',id); renderInvest(); }
+function delInv(id){ const inv=D.investments.find(x=>x.id===id); if(inv) D.investHistory.push({...inv,action:'delete',aDate:today()}); D.investments=D.investments.filter(x=>x.id!==id); save(); renderInvest(); }
 function renderInvDonut(){
   const el=document.getElementById('inv-donut');
   if(!D.investments.length){ el.innerHTML='<div style="color:var(--text3);font-size:11px;">Chưa có dữ liệu</div>'; return; }
@@ -1406,8 +1281,8 @@ window.openModal=function(id){ document.getElementById(id).classList.add('open')
 // TAB 3: DISCIPLINE / HABITS
 // ════════════════════════════════════════
 let dDate=today(), dCalDate=new Date();
-function dPrev(){ const d=new Date(dDate+'T00:00:00'); d.setDate(d.getDate()-1); dDate=d.toISOString().split('T')[0]; renderDiscDay(); }
-function dNext(){ const d=new Date(dDate+'T00:00:00'); d.setDate(d.getDate()+1); dDate=d.toISOString().split('T')[0]; renderDiscDay(); }
+function dPrev(){ dDate=dateShift(dDate,-1); renderDiscDay(); }
+function dNext(){ dDate=dateShift(dDate,+1); renderDiscDay(); }
 function dToday(){ dDate=today(); renderDiscDay(); }
 function dCalPrev(){ dCalDate.setMonth(dCalDate.getMonth()-1); renderDCalGrid(); }
 function dCalNext(){ dCalDate.setMonth(dCalDate.getMonth()+1); renderDCalGrid(); }
@@ -1502,25 +1377,19 @@ function renderHabitsList(ci, isPast){
         <span class="hab-unit">${h.unit}</span>
         <span class="hab-pct" style="color:${pct>=100?'var(--mint)':pct>=50?'var(--gold)':'var(--red)'}">${pct}%</span>
       </div>
-      ${!isPast?`<button class="btn brd bxs" onclick="D.habits=D.habits.filter(x=>x.id!=='${h.id}');save();sbDel('habits','${h.id}');renderDiscDay();renderHabitStats();renderPRs();">✕</button>`:''}
+      ${!isPast?`<button class="btn brd bxs" onclick="D.habits=D.habits.filter(x=>x.id!=='${h.id}');save();renderDiscDay();renderHabitStats();renderPRs();">✕</button>`:''}
     </div>`;
   }).join('');
 }
-function toggleHabit(hid){ const ci=D.checkins[dDate]||(D.checkins[dDate]={}); if(!ci.habits) ci.habits={}; const h=D.habits.find(x=>x.id===hid); if(!h) return; ci.habits[hid]=ci.habits[hid]>=h.target?0:h.target; save(); renderDiscDay(); sbSave('habit_logs',{id:uid(),date:dDate,habit_id:hid,actual_value:ci.habits[hid],is_completed:ci.habits[hid]>=h.target}); }
-function updateHabitVal(hid,val){ const ci=D.checkins[dDate]||(D.checkins[dDate]={}); if(!ci.habits) ci.habits={}; ci.habits[hid]=parseFloat(val)||0; save(); renderDiscDay(); const h=D.habits.find(x=>x.id===hid); sbSave('habit_logs',{id:uid(),date:dDate,habit_id:hid,actual_value:ci.habits[hid],is_completed:!!(h&&ci.habits[hid]>=h.target)}); }
+function toggleHabit(hid){ const ci=D.checkins[dDate]||(D.checkins[dDate]={}); if(!ci.habits) ci.habits={}; const h=D.habits.find(x=>x.id===hid); if(!h) return; ci.habits[hid]=ci.habits[hid]>=h.target?0:h.target; save(); renderDiscDay(); }
+function updateHabitVal(hid,val){ const ci=D.checkins[dDate]||(D.checkins[dDate]={}); if(!ci.habits) ci.habits={}; ci.habits[hid]=parseFloat(val)||0; save(); renderDiscDay(); }
 
 function saveCheckin(){
   const ci=D.checkins[dDate]||(D.checkins[dDate]={});
   ci.wake=document.getElementById('wake-actual').value;
   ci.note=document.getElementById('daily-note').value.trim();
   save(); renderDisc();
-  // Sync Supabase
-  const sc=calcDiscScore(dDate);
-  sbSave('daily_checkins',{id:uid(),date:dDate,wake_time:ci.wake||'',target_wake_time:D.wakeGoal||'05:30',score:sc||0,notes:ci.note||''});
-  if(ci.habits) Object.entries(ci.habits).forEach(([hid,val])=>{
-    const h=D.habits.find(x=>x.id===hid); const done=(h&&val>=h.target);
-    sbSave('habit_logs',{id:uid(),date:dDate,habit_id:hid,actual_value:val||0,is_completed:done});
-  });
+  // flash feedback
   const btn=document.querySelector('[onclick="saveCheckin()"]');
   btn.textContent='✅ Đã lưu!'; setTimeout(()=>btn.textContent='💾 Lưu Check-in',1500);
 }
@@ -1528,11 +1397,9 @@ function saveHabit(){
   const nm=document.getElementById('hab-nm').value.trim(), target=parseFloat(document.getElementById('hab-target').value);
   if(!nm||!target){ alert('Nhập đủ thông tin!'); return; }
   if(!D.habits) D.habits=[];
-  const hObj={id:uid(),nm,icon:document.getElementById('hab-icon').value||'💪',unit:document.getElementById('hab-unit').value,target,color:document.getElementById('hab-color').value};
-  D.habits.push(hObj);
+  D.habits.push({id:uid(),nm,icon:document.getElementById('hab-icon').value||'💪',unit:document.getElementById('hab-unit').value,target,color:document.getElementById('hab-color').value});
   save(); closeModal('mo-add-habit'); document.getElementById('hab-nm').value=''; document.getElementById('hab-target').value='';
   renderDiscDay(); renderHabitStats(); renderPRs();
-  sbSave('habits',{id:hObj.id,name:hObj.nm,icon:hObj.icon,target_value:hObj.target,unit:hObj.unit,color:hObj.color||'#b87fff',repeat_days:[],is_active:true});
 }
 function saveWakeGoal(){ D.wakeGoal=document.getElementById('wake-goal-inp').value; save(); closeModal('mo-wake-setting'); document.getElementById('wake-target').textContent=D.wakeGoal; updateWakeStatus(); }
 
@@ -1592,24 +1459,6 @@ function renderDCalGrid(){
 // ════════════════════════════════════════
 renderOverview();
 setInterval(()=>{ if(document.getElementById('sp-overview').classList.contains('active')) renderTimeline(); }, 60000);
-
-// ════════════════════════════════════════
-// INIT — Gọi khi trang load
-// ════════════════════════════════════════
-function refreshAll(){
-  try { renderOverview(); } catch(e){}
-  try { renderTimeline(); } catch(e){}
-  try { renderTaskBox(); } catch(e){}
-  try { renderTxs(); renderCharts(); } catch(e){}
-  try { renderCal(); } catch(e){}
-  try { renderInvest(); } catch(e){}
-  try { renderDisc(); } catch(e){}
-  try { updateStreak(); } catch(e){}
-}
-
-// Khởi động — load Supabase, fallback localStorage
-window.addEventListener('load', ()=>{ sbInit(); });
-
 </script>
 </body>
 </html>
