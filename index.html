@@ -1016,7 +1016,7 @@ function switchSub(name,el){
   document.getElementById('sp-'+name).classList.add('active');
   if(name==='overview') renderOverview();
   if(name==='txs'){ renderTxs(); renderCharts(); populateTxFilters(); }
-  if(name==='calendar') renderCal();
+  if(name==='calendar'){ if(!selCalDate) selCalDate=today(); renderCal(); renderCalDetail(selCalDate); document.getElementById('cal-add-btn').style.display='flex'; }
   if(name==='kydiscipline') renderKyDiscipline();
 }
 
@@ -1270,7 +1270,35 @@ function saveTx(){
   const name=document.getElementById('tx-nm').value.trim(), amount=parseFloat(document.getElementById('tx-amt').value), date=document.getElementById('tx-dt').value;
   if(!name||!amount||!date){ alert('Điền đủ thông tin!'); return; }
   D.transactions.push({id:uid(),name,amount,date,type:document.getElementById('tx-type-v').value,category:document.getElementById('tx-cat').value});
-  save(); closeModal('mo-tx'); document.getElementById('tx-nm').value=''; document.getElementById('tx-amt').value='';
+  save(); closeModal('mo-tx'); document.getElementById('tx-nm').value=''; document.getElementById('tx-amt').value=''; document.querySelector('#mo-tx .mt2').textContent='💸 Thêm Giao Dịch'; const sb=document.querySelector('#mo-tx .btn.bm'); if(sb){sb.textContent='💾 Lưu';sb.onclick=saveTx;}
+  renderTxs(); renderCharts(); renderOverview();
+}
+function editTx(id){
+  const t=D.transactions.find(x=>x.id===id); if(!t) return;
+  document.getElementById('tx-nm').value=t.name;
+  document.getElementById('tx-amt').value=t.amount;
+  document.getElementById('tx-dt').value=t.date;
+  document.getElementById('tx-type-v').value=t.type;
+  document.getElementById('tx-cat').value=t.category;
+  // đổi nút Lưu thành Cập nhật
+  const saveBtn=document.querySelector('#mo-tx .btn.bm');
+  if(saveBtn){ saveBtn.textContent='💾 Cập nhật'; saveBtn.onclick=()=>updateTx(id); }
+  openModal('mo-tx');
+  document.querySelector('#mo-tx .mt2').textContent='✏️ Sửa Giao Dịch';
+}
+function updateTx(id){
+  const t=D.transactions.find(x=>x.id===id); if(!t) return;
+  t.name=document.getElementById('tx-nm').value.trim();
+  t.amount=parseFloat(document.getElementById('tx-amt').value);
+  t.date=document.getElementById('tx-dt').value;
+  t.type=document.getElementById('tx-type-v').value;
+  t.category=document.getElementById('tx-cat').value;
+  save(); closeModal('mo-tx');
+  // reset lại nút Lưu
+  const saveBtn=document.querySelector('#mo-tx .btn.bm');
+  if(saveBtn){ saveBtn.textContent='💾 Lưu'; saveBtn.onclick=saveTx; }
+  document.querySelector('#mo-tx .mt2').textContent='💸 Thêm Giao Dịch';
+  document.getElementById('tx-nm').value=''; document.getElementById('tx-amt').value='';
   renderTxs(); renderCharts(); renderOverview();
 }
 function populateTxFilters(){
@@ -1309,7 +1337,7 @@ function renderTxs(){
       html+=`<div class="txi"><div class="txic" style="background:${t.type==='thu'?'var(--mint-dim)':'var(--red-dim)'}">${CATI[t.category]||'💰'}</div>
         <div class="txin"><div class="txname">${t.name}</div><div class="txcat">${t.category}</div></div>
         <div class="txamt ${t.type==='thu'?'inc':'exp'}">${t.type==='thu'?'+':'-'}${fmt(t.amount)}</div>
-        <button class="btn brd bxs" onclick="D.transactions=D.transactions.filter(x=>x.id!=='${t.id}');save();renderTxs();renderCharts();renderOverview();">✕</button>
+        <button class="btn bb bxs" style="padding:5px 10px;font-size:11px;" onclick="editTx('${t.id}')">✏️</button>
       </div>`;
     });
   });
@@ -1345,6 +1373,7 @@ function renderCharts(){
 let calDate=new Date(), selCalDate=null;
 function calPrev(){ calDate.setMonth(calDate.getMonth()-1); renderCal(); }
 function calNext(){ calDate.setMonth(calDate.getMonth()+1); renderCal(); }
+let selCalDate=today();
 function renderCal(){
   const y=calDate.getFullYear(), m=calDate.getMonth();
   document.getElementById('cal-month-lbl').textContent=`Tháng ${m+1}/${y}`;
