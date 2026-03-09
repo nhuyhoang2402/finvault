@@ -42,7 +42,7 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
 .mtab.active{color:var(--blue);border-bottom-color:var(--blue);}
 .mtab.t2.active{color:var(--gold);border-bottom-color:var(--gold);}
 .mtab.t3.active{color:var(--purple);border-bottom-color:var(--purple);}
-.mpanel{display:none;} .mpanel.active{display:block;}
+.mpanel{display:none;} .mpanel.active{display:block;min-height:100%;}
 
 /* ── SUB TABS ── */
 .sub-tabs{padding:14px 24px 0;display:flex;gap:2px;}
@@ -60,11 +60,11 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
 .cb{padding:16px;}
 
 /* ── STAT CARDS ── */
-.sg{display:grid;gap:10px;}
+.sg{display:grid;gap:8px;}
 .sg4{grid-template-columns:repeat(4,1fr);}
 .sg5{grid-template-columns:repeat(5,1fr);}
 .sg3{grid-template-columns:repeat(3,1fr);}
-.sc{background:var(--s1);border:1.5px solid var(--border);border-radius:14px;padding:10px 14px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(59,91,219,0.07);height:90px;}
+.sc{background:var(--s1);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(59,91,219,0.07);}
 .sc:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 6px 20px rgba(59,91,219,0.13);}
 .sc.acc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--mint),transparent);}
 .sc.acc-gold::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);}
@@ -117,7 +117,7 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
 /* ══════════════════════════════════════
    TAB 1 — PERSONAL STYLES
 ══════════════════════════════════════ */
-.ov-grid{display:grid;grid-template-columns:3fr 2fr;gap:16px;}
+.ov-grid{display:flex;gap:12px;align-items:flex-start;}
 
 /* Timeline */
 .tl-wrap{overflow-y:auto;max-height:calc(100vh - 280px);min-height:200px;padding-right:3px;}
@@ -377,11 +377,11 @@ body.light .rin{background:#eaeeff;border-color:#c5cfe8;color:#1a2035;}
 .tl-m3-block.tl-missed{animation:tl-pulse 2.5s ease-in-out infinite;}
 
 /* ══ APP SHELL: SIDEBAR LAYOUT ══ */
-body{overflow:hidden;height:100vh;}
-.app-shell{display:flex;height:100vh;overflow:hidden;}
+body{overflow:hidden;height:100vh;margin:0;}
+.app-shell{display:flex;width:100%;height:100vh;overflow:hidden;}
 
 /* SIDEBAR */
-.sidebar{width:240px;min-width:240px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;z-index:100;box-shadow:2px 0 16px rgba(59,91,219,0.06);}
+.sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;z-index:100;box-shadow:2px 0 12px rgba(59,91,219,0.06);}
 .sb-logo{display:flex;align-items:center;gap:12px;padding:22px 20px 16px;border-bottom:1px solid var(--border);}
 .sb-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--mint),var(--blue));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .sb-logo-name{font-size:16px;font-weight:800;color:var(--blue);letter-spacing:.5px;}
@@ -389,19 +389,19 @@ body{overflow:hidden;height:100vh;}
 .sb-date-box{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--s2);}
 .sb-date-day{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
 .sb-date-full{font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
-.sb-nav{padding:12px 12px;flex:1;}
+.sb-nav{padding:8px 10px;flex:1;}
 .sb-nav-label{font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:4px 8px 8px;}
 .sb-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text3);transition:all .2s;margin-bottom:2px;background:transparent;}
 .sb-item:hover{background:var(--s2);color:var(--text2);}
 .sb-item.active{background:var(--blue-dim);color:var(--blue);font-weight:700;}
 .sb-item.active .sb-icon{filter:none;}
 .sb-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
-.sb-bottom{padding:16px;border-top:1px solid var(--border);margin-top:auto;}
+.sb-bottom{padding:10px 12px;border-top:1px solid var(--border);margin-top:auto;}
 .theme-btn{width:100%;padding:9px;border-radius:10px;border:1.5px solid var(--border);background:var(--s2);font-family:var(--sans);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
 .theme-btn:hover{border-color:var(--blue);color:var(--blue);}
 
 /* MAIN CONTENT */
-.main-content{flex:1;overflow-y:auto;height:100vh;background:var(--bg);}
+.main-content{flex:1;min-width:0;overflow-x:hidden;overflow-y:auto;height:100vh;background:var(--bg);}
 
 /* Hide old topbar/main-tabs */
 .topbar{display:none!important;}
@@ -411,7 +411,7 @@ body{overflow:hidden;height:100vh;}
 .mpanel{display:none;} .mpanel.active{display:block;}
 
 /* Sub-tabs spacing */
-.sub-tabs{padding:16px 24px 0;}
+.sub-tabs{padding:12px 16px 0;}
 
 
 /* ── Button đồng bộ Edmicro ── */
@@ -516,7 +516,7 @@ body{overflow:hidden;height:100vh;}
   </div>
 </div>
 
-<div id="app-shell-wrap" style="display:none;width:100%;height:100vh;"><div class="app-shell">
+<div id="app-shell-wrap" style="display:none;width:100vw;height:100vh;overflow:hidden;"><div class="app-shell">
 
 <!-- ══ SIDEBAR TRÁI ══ -->
 <div class="sidebar">
@@ -581,7 +581,7 @@ body{overflow:hidden;height:100vh;}
     </div>
     <div class="ov-grid">
       <!-- Timeline -->
-      <div class="card">
+      <div style="flex:3;min-width:0;"><div class="card">
         <div class="ch">
           <div class="ct">⏰ Thời Gian Biểu</div>
           <div style="display:flex;gap:6px;align-items:center;">
@@ -595,9 +595,9 @@ body{overflow:hidden;height:100vh;}
           </div>
         </div>
         <div class="cb" style="padding:10px 12px;"><div class="tl-wrap" id="tl-wrap"></div></div>
-      </div>
+      </div></div>
       <!-- Task box -->
-      <div class="card">
+      <div style="flex:2;min-width:0;"><div class="card">
         <div class="ch">
           <div class="ct">✅ Task Hôm Nay</div>
           <div style="display:flex;gap:5px;align-items:center;">
@@ -622,7 +622,7 @@ body{overflow:hidden;height:100vh;}
           <div id="task-box"></div>
           <div id="task-sum" style="display:none;" class="tsum"></div>
         </div>
-      </div>
+      </div></div>
     </div>
   </div>
 
