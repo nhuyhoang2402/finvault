@@ -1370,10 +1370,9 @@ function renderCharts(){
 // ════════════════════════════════════════
 // CALENDAR
 // ════════════════════════════════════════
-let calDate=new Date(), selCalDate=null;
+let calDate=new Date(), selCalDate=today();
 function calPrev(){ calDate.setMonth(calDate.getMonth()-1); renderCal(); }
 function calNext(){ calDate.setMonth(calDate.getMonth()+1); renderCal(); }
-let selCalDate=today();
 function renderCal(){
   const y=calDate.getFullYear(), m=calDate.getMonth();
   document.getElementById('cal-month-lbl').textContent=`Tháng ${m+1}/${y}`;
