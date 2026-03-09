@@ -484,21 +484,34 @@ body{overflow:hidden;height:100vh;}
         <div class="login-logo-sub">Quản lý tài chính cá nhân</div>
       </div>
     </div>
+
+    <!-- Tab switch -->
+    <div style="display:flex;gap:4px;background:#f5f7fe;border-radius:12px;padding:4px;margin-bottom:22px;">
+      <button id="tab-login-btn" onclick="switchAuthTab('login')" style="flex:1;padding:8px;border:none;border-radius:9px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:#3b5bdb;color:#fff;transition:all .2s;">Đăng nhập</button>
+      <button id="tab-reg-btn"   onclick="switchAuthTab('register')" style="flex:1;padding:8px;border:none;border-radius:9px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#9aa3c2;transition:all .2s;">Tạo tài khoản</button>
+    </div>
+
+    <!-- Form đăng nhập -->
     <div id="login-form-wrap">
-      <div class="login-title">Đăng nhập</div>
-      <div class="login-sub">Nhập tên và mật khẩu để vào tài khoản</div>
       <div class="login-field"><label>Tên tài khoản</label><input id="li-user" type="text" placeholder="vd: nguyen_van_a" autocomplete="username"></div>
       <div class="login-field"><label>Mật khẩu</label><input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
       <button class="login-btn" onclick="doLogin()">Đăng nhập →</button>
       <div class="login-err" id="login-err"></div>
     </div>
-    <div class="login-accounts" id="login-acc-wrap" style="display:none;">
-      <div class="login-acc-label">Tài khoản đã có</div>
-      <div class="login-acc-list" id="login-acc-list"></div>
+
+    <!-- Form tạo tài khoản -->
+    <div id="reg-form-wrap" style="display:none;">
+      <div class="login-field"><label>Tên tài khoản</label><input id="reg-user" type="text" placeholder="vd: nguyen_van_b" autocomplete="off"></div>
+      <div class="login-field"><label>Mật khẩu</label><input id="reg-pass" type="password" placeholder="Tối thiểu 4 ký tự" autocomplete="new-password"></div>
+      <div class="login-field"><label>Nhập lại mật khẩu</label><input id="reg-pass2" type="password" placeholder="Nhập lại mật khẩu" autocomplete="new-password"></div>
+      <button class="login-btn" style="background:linear-gradient(135deg,#00c896,#0ea5e9);" onclick="doRegister()">Tạo tài khoản →</button>
+      <div class="login-err" id="reg-err"></div>
     </div>
-    <div style="text-align:center;margin-top:14px;">
-      <span style="font-size:11px;color:#9aa3c2;">Chưa có tài khoản? </span>
-      <span style="font-size:11px;color:#3b5bdb;cursor:pointer;font-weight:700;" onclick="showRegister()">Tạo mới</span>
+
+    <!-- Danh sách tài khoản đã có -->
+    <div class="login-accounts" id="login-acc-wrap" style="display:none;">
+      <div class="login-acc-label">Chọn nhanh</div>
+      <div class="login-acc-list" id="login-acc-list"></div>
     </div>
   </div>
 </div>
@@ -1067,6 +1080,8 @@ function setTopbarDate(){
   const old=document.getElementById('topbar-date'); if(old) old.textContent=now.toLocaleDateString('vi-VN',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'});
 }
 setTopbarDate();
+
+// initAuth() sẽ được gọi ở cuối file sau khi khai báo xong
 
 // ════════════════════════════════════════
 // MAIN TAB SWITCH
@@ -1825,6 +1840,7 @@ function toggleTheme(){
   localStorage.setItem('fv-theme', isDark ? 'dark' : 'light');
 }
 // Load saved theme
+// ═══ KHỞI ĐỘNG AUTH (sau khi tất cả đã khai báo) ═══
 (function(){
   const t = localStorage.getItem('fv-theme');
   if(t === 'dark'){
@@ -1933,23 +1949,42 @@ function doLogin(){
   loginAs(acc, true);
 }
 
-function showRegister(){
-  const user = prompt('Tên tài khoản (không dấu, không cách):');
-  if(!user) return;
-  const clean = user.trim().toLowerCase().replace(/\s+/g,'_');
-  if(!clean){ alert('Tên không hợp lệ!'); return; }
+function showRegister(){ switchAuthTab('register'); }
+
+function switchAuthTab(tab){
+  const isLogin = tab==='login';
+  document.getElementById('login-form-wrap').style.display = isLogin?'block':'none';
+  document.getElementById('reg-form-wrap').style.display   = isLogin?'none':'block';
+  const lb=document.getElementById('tab-login-btn'), rb=document.getElementById('tab-reg-btn');
+  if(lb&&rb){
+    lb.style.background = isLogin?'#3b5bdb':'transparent';
+    lb.style.color = isLogin?'#fff':'#9aa3c2';
+    lb.style.fontWeight = isLogin?'700':'600';
+    rb.style.background = isLogin?'transparent':'#3b5bdb';
+    rb.style.color = isLogin?'#9aa3c2':'#fff';
+    rb.style.fontWeight = isLogin?'600':'700';
+  }
+  document.getElementById('login-err').textContent='';
+  if(document.getElementById('reg-err')) document.getElementById('reg-err').textContent='';
+}
+
+function doRegister(){
+  const user = document.getElementById('reg-user').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  const pass  = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  const err   = document.getElementById('reg-err');
+  if(!user){ err.textContent='Tên không hợp lệ (chỉ dùng a-z, 0-9, _)!'; return; }
+  if(pass.length<4){ err.textContent='Mật khẩu tối thiểu 4 ký tự!'; return; }
+  if(pass!==pass2){ err.textContent='Mật khẩu nhập lại không khớp!'; return; }
   const accs = getAccounts();
-  if(accs.find(a=>a.user===clean)){ alert('Tên đã tồn tại!'); return; }
-  const pass = prompt('Mật khẩu:');
-  if(!pass){ return; }
-  const pass2 = prompt('Nhập lại mật khẩu:');
-  if(pass !== pass2){ alert('Mật khẩu không khớp!'); return; }
-  const newAcc = {user:clean, passHash:hashPass(pass)};
-  accs.push(newAcc);
+  if(accs.find(a=>a.user===user)){ err.textContent='Tên tài khoản đã tồn tại!'; return; }
+  accs.push({user, passHash:hashPass(pass)});
   saveAccounts(accs);
-  alert('✅ Tạo tài khoản thành công! Đăng nhập ngay.');
-  document.getElementById('li-user').value = clean;
-  document.getElementById('li-pass').value = pass;
+  // Tự login luôn
+  err.textContent='';
+  document.getElementById('li-user').value=user;
+  document.getElementById('li-pass').value=pass;
+  switchAuthTab('login');
   renderAccList();
   doLogin();
 }
@@ -2009,9 +2044,8 @@ function loginAs(acc, saveSession){
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app-shell-wrap').style.display='flex';
 
-  // Re-render
-  setTimeout(()=>{ // Khởi động auth
-initAuth(); }, 100);
+  // Re-render sau khi login
+  setTimeout(()=>{ renderOverview(); renderTimeline(); renderTaskBox(); updateStreak(); setTopbarDate(); }, 100);
 }
 
 function doLogout(){
@@ -2025,9 +2059,15 @@ function doLogout(){
 
 // Cho phép Enter để login
 document.addEventListener('keydown', e=>{
-  if(e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')) doLogin();
+  if(e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')){
+    const regVisible = document.getElementById('reg-form-wrap').style.display!=='none';
+    if(regVisible) doRegister(); else doLogin();
+  }
 });
 
+
+// ═══ KHỞI ĐỘNG ═══
+initAuth();
 </script>
 
 <!-- Modal xem/sửa task -->
