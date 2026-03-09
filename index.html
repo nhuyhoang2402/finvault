@@ -347,7 +347,7 @@ body.light .rin{background:#eaeeff;border-color:#c5cfe8;color:#1a2035;}
 .tl-m3-right{display:flex;align-items:center;gap:4px;flex-shrink:0;}
 .tl-m3-dur{font-family:var(--mono);font-size:11px;font-weight:700;opacity:1;color:var(--text2);background:rgba(0,0,0,0.06);padding:2px 7px;border-radius:6px;}
 .tl-m3-pts{font-size:10px;font-weight:800;padding:2px 7px;border-radius:7px;background:rgba(255,255,255,0.4);}
-.tl-m3-miss-tag{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:800;color:var(--red);background:rgba(240,74,74,.1);padding:2px 7px;border-radius:8px;}
+.tl-m3-miss-tag{display:none;}
 @keyframes tl-pulse{0%,100%{box-shadow:0 0 0 0 rgba(240,74,74,0);}50%{box-shadow:0 0 0 5px rgba(240,74,74,0.08);}}
 .tl-m3-block.tl-missed{animation:tl-pulse 2.5s ease-in-out infinite;}
 
@@ -1088,7 +1088,7 @@ function renderTimeline(){
           ${ck?`<span class="tl-m3-pts" style="color:var(--mint);">✅</span>`:''}
         </div>
         ${isMissed?'<div class="tl-m3-miss-tag">Quá giờ</div>':''}
-        ${isActive&&!ck?`<div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:8px;color:${color};opacity:.55;">▶ Đang diễn ra</div>`:''}
+        ${isActive&&!ck?`<div style="display:none;font-size:8px;color:${color};opacity:.55;">▶ Đang diễn ra</div>`:''}
       </div>
     </div>`;
   });
