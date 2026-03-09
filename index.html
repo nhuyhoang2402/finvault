@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FinVault — Quản Lý Cá Nhân</title>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
   /* ── Edmicro Light Theme ── */
@@ -17,7 +17,7 @@
   --purple:#7c3aed; --purple-dim:rgba(124,58,237,0.1);
   --orange:#f97316; --orange-dim:rgba(249,115,22,0.1);
   --text:#1a1d2e; --text2:#5a6282; --text3:#9aa3c2;
-  --mono:'DM Mono',monospace; --sans:'Be Vietnam Pro',sans-serif;
+  --mono:'JetBrains Mono',monospace; --sans:'Inter',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -161,7 +161,7 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
 .empty-t{text-align:center;padding:24px;color:var(--text3);font-size:12px;}
 
 /* TX list */
-.tc-layout{display:grid;grid-template-columns:1fr 260px;gap:16px;}
+.tc-layout{display:grid;grid-template-columns:3fr 2fr;gap:16px;}
 .tx-gdate{padding:8px 14px;background:var(--s2);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;display:flex;justify-content:space-between;}
 .txi{display:flex;align-items:center;gap:11px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer;}
 .txi:hover{background:#f0f4ff;}
@@ -311,15 +311,38 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
   .disc-header{grid-template-columns:repeat(3,1fr);}
 }
 
-/* ── LIGHT MODE ── */
-body.light{--bg:#f0f4ff;--s1:#ffffff;--s2:#f5f7ff;--s3:#eaeeff;--s4:#dde3f5;--border:#d0d8ee;--border2:#c5cfe8;--text:#1a2035;--text2:#3a4a6a;--text3:#7a8aaa;}
-body.light .topbar,body.light .main-tabs{box-shadow:0 1px 8px rgba(0,0,0,.06);}
+/* ── DEFAULT = LIGHT MODE (Edmicro style) ── */
+:root{--bg:#f0f3fb;--s1:#fff;--s2:#f5f7fe;--s3:#eaedfa;--s4:#e0e5f5;--border:#e3e8f4;--border2:#d0d8ef;--text:#1a1d2e;--text2:#5a6282;--text3:#9aa3c2;}
+body.light{--bg:#f0f3fb;--s1:#ffffff;--s2:#f5f7fe;--s3:#eaedfa;--s4:#e0e5f5;--border:#e3e8f4;--border2:#d0d8ef;--text:#1a1d2e;--text2:#5a6282;--text3:#9aa3c2;}
+
+/* ── DARK MODE ── */
+body.dark{
+  --bg:#0f1117;--s1:#1a1d2e;--s2:#1e2235;--s3:#252840;--s4:#2d3150;
+  --border:#2d3150;--border2:#363a5a;
+  --text:#e8eaf6;--text2:#9aa3c2;--text3:#5a6282;
+}
+body.dark .sidebar{background:#1a1d2e;border-color:#2d3150;}
+body.dark .sb-date-box{background:#1e2235;}
+body.dark .card{background:#1a1d2e!important;border-color:#2d3150!important;box-shadow:0 4px 20px rgba(0,0,0,.3)!important;}
+body.dark .sc{background:#1a1d2e!important;border-color:#2d3150!important;}
+body.dark .mbox{background:#1a1d2e;border-color:#2d3150;}
+body.dark .tcsearch,.dark .tcsel{background:#1e2235;border-color:#2d3150;color:#e8eaf6;}
+body.dark .ttbl th{background:#252840;color:#9aa3c2;}
+body.dark .ttbl td{border-color:#2d3150;}
+body.dark .rin,.dark textarea{background:#252840;border-color:#2d3150;color:#e8eaf6;}
+body.dark input,.dark select{background:#1e2235;border-color:#2d3150;color:#e8eaf6;}
+body.dark .fi input,.dark .fi select,.dark .fi textarea{background:#252840;border-color:#2d3150;color:#e8eaf6;}
+body.dark .bgh{background:#252840!important;color:#9aa3c2!important;border-color:#363a5a!important;}
+body.dark .txi{border-bottom-color:#2d3150;}
+body.dark .tbtn{background:#1e2235;border-color:#2d3150;color:#5a6282;}
+body.dark .stab{color:#5a6282;}
+body.dark .stab.active{background:#252840;color:#e8eaf6;}
+
+/* Light mode extras */
 body.light .card{box-shadow:0 2px 12px rgba(0,0,0,.06);}
-body.light .tl-row{border-color:#dde3f5;}
 body.light .ttbl th{background:#eaeeff;color:#3a4a6a;}
-body.light .ttbl td{border-color:#dde3f5;}
 body.light .rin{background:#eaeeff;border-color:#c5cfe8;color:#1a2035;}
-.theme-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;}
+.theme-btn{width:100%;padding:9px;border-radius:10px;border:1.5px solid var(--border);background:var(--s2);font-family:var(--sans);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
 .theme-btn:hover{background:var(--s3);}
 
 /* ── Timeline Mẫu 3: Block Cards ── */
@@ -951,7 +974,15 @@ const load = () => {
 load();
 
 // ── helpers ──
-const fmt = n => new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(n||0);
+const fmt = n => {
+  const v = Math.abs(n||0);
+  const sign = (n||0) < 0 ? '-' : '';
+  if(v >= 1000000000) return sign + (v/1000000000).toFixed(1).replace('.0','') + ' Tỷ';
+  if(v >= 1000000)    return sign + (v/1000000).toFixed(1).replace('.0','') + 'Tr';
+  if(v >= 1000)       return sign + (v/1000).toFixed(0) + 'K';
+  return sign + v + 'đ';
+};
+const fmtFull = n => new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(n||0);
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const today = () => new Date().toISOString().split('T')[0];
 const nowM  = () => new Date().toISOString().slice(0,7);
@@ -1259,7 +1290,7 @@ function populateTxFilters(){
   cEl.innerHTML='<option value="">Tất cả danh mục</option>'+cs.map(c=>`<option value="${c}" ${c===ccur?'selected':''}>${CATI[c]||''} ${c}</option>`).join('');
 }
 function renderTxs(){
-  let txs=[...D.transactions].sort((a,b)=>b.date.localeCompare(a.date));
+  let txs=[...D.transactions].sort((a,b)=>{ const dc=b.date.localeCompare(a.date); if(dc!==0) return dc; return (b.time||'99:99').localeCompare(a.time||'00:00'); });
   const s=document.getElementById('tx-srch')?.value.toLowerCase();
   const mf=document.getElementById('tx-fm')?.value, cf=document.getElementById('tx-fc')?.value, tf=document.getElementById('tx-ft')?.value;
   if(s) txs=txs.filter(t=>t.name.toLowerCase().includes(s));
@@ -1693,12 +1724,25 @@ setInterval(()=>{ if(document.getElementById('sp-overview').classList.contains('
 
 // ── THEME TOGGLE ──
 function toggleTheme(){
-  const isLight = document.body.classList.toggle('light');
-  document.getElementById('theme-btn').textContent = isLight ? '☀️' : '🌙';
-  localStorage.setItem('fv-theme', isLight ? 'light' : 'dark');
+  const isDark = document.body.classList.toggle('dark');
+  document.body.classList.toggle('light', !isDark);
+  const btn = document.getElementById('theme-btn');
+  if(btn) btn.textContent = isDark ? '☀️ Sáng' : '🌙 Tối';
+  localStorage.setItem('fv-theme', isDark ? 'dark' : 'light');
 }
 // Load saved theme
-(function(){ if(localStorage.getItem('fv-theme')==='light'){ document.body.classList.add('light'); setTimeout(()=>{ const b=document.getElementById('theme-btn'); if(b) b.textContent='☀️'; },0); } })();
+(function(){
+  const t = localStorage.getItem('fv-theme');
+  if(t === 'dark'){
+    document.body.classList.add('dark');
+    document.body.classList.remove('light');
+    setTimeout(()=>{ const b=document.getElementById('theme-btn'); if(b) b.textContent='☀️ Sáng'; },0);
+  } else {
+    document.body.classList.add('light');
+    document.body.classList.remove('dark');
+    setTimeout(()=>{ const b=document.getElementById('theme-btn'); if(b) b.textContent='🌙 Tối'; },0);
+  }
+})();
 
 // ── TASK DETAIL ──
 let viewingTaskId = null;
