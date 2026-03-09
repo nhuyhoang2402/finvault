@@ -64,7 +64,7 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
 .sg4{grid-template-columns:repeat(4,1fr);}
 .sg5{grid-template-columns:repeat(5,1fr);}
 .sg3{grid-template-columns:repeat(3,1fr);}
-.sc{background:var(--s1);border:1.5px solid var(--border);border-radius:14px;padding:11px 14px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(59,91,219,0.07);}
+.sc{background:var(--s1);border:1.5px solid var(--border);border-radius:14px;padding:10px 14px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(59,91,219,0.07);height:90px;}
 .sc:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 6px 20px rgba(59,91,219,0.13);}
 .sc.acc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--mint),transparent);}
 .sc.acc-gold::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);}
@@ -974,15 +974,7 @@ const load = () => {
 load();
 
 // ── helpers ──
-const fmt = n => {
-  const v = Math.abs(n||0);
-  const sign = (n||0) < 0 ? '-' : '';
-  if(v >= 1000000000) return sign + (v/1000000000).toFixed(1).replace('.0','') + ' Tỷ';
-  if(v >= 1000000)    return sign + (v/1000000).toFixed(1).replace('.0','') + 'Tr';
-  if(v >= 1000)       return sign + (v/1000).toFixed(0) + 'K';
-  return sign + v + 'đ';
-};
-const fmtFull = n => new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(n||0);
+const fmt = n => new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(n||0);
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const today = () => new Date().toISOString().split('T')[0];
 const nowM  = () => new Date().toISOString().slice(0,7);
@@ -1308,6 +1300,7 @@ function renderTxs(){
   if(!txs.length){ el.innerHTML='<div style="text-align:center;padding:32px;color:var(--text3);font-size:12px;">Không có giao dịch</div>'; return; }
   let html='';
   Object.keys(groups).sort().reverse().forEach(date=>{
+    groups[date].sort((a,b)=>(b.time||'00:00').localeCompare(a.time||'00:00'));
     const gT=groups[date].filter(t=>t.type==='thu').reduce((a,b)=>a+b.amount,0);
     const gC=groups[date].filter(t=>t.type==='chi').reduce((a,b)=>a+b.amount,0);
     const d=new Date(date+'T00:00:00');
