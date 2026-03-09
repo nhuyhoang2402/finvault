@@ -437,10 +437,73 @@ body{overflow:hidden;height:100vh;}
 
 /* Health category color in timeline */
 .tl-health-color{color:#0ea5e9;}
+
+/* ══ LOGIN SCREEN ══ */
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#f0f3fb 0%,#e8ecf8 100%);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:'Inter',sans-serif;}
+.login-screen.hidden{display:none;}
+.login-box{background:#fff;border:1.5px solid #e3e8f4;border-radius:20px;padding:36px 32px;width:360px;box-shadow:0 8px 40px rgba(59,91,219,0.12);}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+.login-logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#00c896,#3b5bdb);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.login-logo-name{font-size:22px;font-weight:800;color:#3b5bdb;}
+.login-logo-sub{font-size:11px;color:#9aa3c2;margin-top:1px;}
+.login-title{font-size:15px;font-weight:700;color:#1a1d2e;margin-bottom:6px;}
+.login-sub{font-size:12px;color:#9aa3c2;margin-bottom:22px;}
+.login-field{margin-bottom:14px;}
+.login-field label{font-size:11px;font-weight:700;color:#5a6282;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.login-field input{width:100%;padding:10px 14px;border:1.5px solid #e3e8f4;border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;color:#1a1d2e;outline:none;transition:border-color .2s;background:#f5f7fe;}
+.login-field input:focus{border-color:#3b5bdb;background:#fff;}
+.login-btn{width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(135deg,#3b5bdb,#5c7cfa);color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:6px;}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,91,219,0.3);}
+.login-err{font-size:12px;color:#f04a4a;margin-top:8px;text-align:center;min-height:18px;}
+.login-accounts{margin-top:18px;border-top:1px solid #e3e8f4;padding-top:16px;}
+.login-acc-label{font-size:10px;font-weight:700;color:#9aa3c2;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.login-acc-list{display:flex;flex-direction:column;gap:7px;}
+.login-acc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:#f5f7fe;border:1.5px solid #e3e8f4;cursor:pointer;transition:all .2s;}
+.login-acc-item:hover{border-color:#3b5bdb;background:#eef1ff;}
+.login-acc-avatar{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
+.login-acc-name{font-size:13px;font-weight:600;color:#1a1d2e;flex:1;}
+.login-acc-sub{font-size:10px;color:#9aa3c2;}
+
+/* ══ USER BADGE ở sidebar ══ */
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--border);margin-top:auto;}
+.sb-user-avatar{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;}
+.sb-user-name{font-size:13px;font-weight:700;color:var(--text);flex:1;}
+.sb-user-sub{font-size:10px;color:var(--text3);}
+.sb-logout{font-size:10px;color:var(--red);cursor:pointer;font-weight:600;padding:3px 7px;border-radius:6px;border:1px solid rgba(240,74,74,0.2);background:rgba(240,74,74,0.05);transition:all .2s;white-space:nowrap;}
+.sb-logout:hover{background:rgba(240,74,74,0.12);}
 </style>
 </head>
 <body>
-<div class="app-shell">
+<!-- ══ LOGIN SCREEN ══ -->
+<div class="login-screen hidden" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">💎</div>
+      <div>
+        <div class="login-logo-name">FinVault</div>
+        <div class="login-logo-sub">Quản lý tài chính cá nhân</div>
+      </div>
+    </div>
+    <div id="login-form-wrap">
+      <div class="login-title">Đăng nhập</div>
+      <div class="login-sub">Nhập tên và mật khẩu để vào tài khoản</div>
+      <div class="login-field"><label>Tên tài khoản</label><input id="li-user" type="text" placeholder="vd: nguyen_van_a" autocomplete="username"></div>
+      <div class="login-field"><label>Mật khẩu</label><input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="login-btn" onclick="doLogin()">Đăng nhập →</button>
+      <div class="login-err" id="login-err"></div>
+    </div>
+    <div class="login-accounts" id="login-acc-wrap" style="display:none;">
+      <div class="login-acc-label">Tài khoản đã có</div>
+      <div class="login-acc-list" id="login-acc-list"></div>
+    </div>
+    <div style="text-align:center;margin-top:14px;">
+      <span style="font-size:11px;color:#9aa3c2;">Chưa có tài khoản? </span>
+      <span style="font-size:11px;color:#3b5bdb;cursor:pointer;font-weight:700;" onclick="showRegister()">Tạo mới</span>
+    </div>
+  </div>
+</div>
+
+<div id="app-shell-wrap" style="display:none;width:100%;height:100vh;"><div class="app-shell">
 
 <!-- ══ SIDEBAR TRÁI ══ -->
 <div class="sidebar">
@@ -471,7 +534,15 @@ body{overflow:hidden;height:100vh;}
   </nav>
 
   <div class="sb-bottom">
-    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn" title="Đổi màu">🌙 Đổi theme</button>
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn" title="Đổi màu">🌙 Tối</button>
+    <div class="sb-user" id="sb-user" style="margin-top:10px;padding:10px 0 0;border-top:1px solid var(--border);">
+      <div class="sb-user-avatar" id="sb-user-avatar" style="background:#3b5bdb;">U</div>
+      <div>
+        <div class="sb-user-name" id="sb-user-name">—</div>
+        <div class="sb-user-sub">Đang đăng nhập</div>
+      </div>
+      <span class="sb-logout" onclick="doLogout()">Đăng xuất</span>
+    </div>
   </div>
 </div>
 
@@ -973,7 +1044,7 @@ const load = () => {
     if(saved._schedVer !== SCHED_VER) D.schedules = defaultScheds;
   }catch(e){} }
 };
-load();
+// load() sẽ được gọi qua initAuth sau khi DOM ready
 
 // ── helpers ──
 const fmt = n => new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(n||0);
@@ -1798,6 +1869,165 @@ function editTaskFromDetail(){
   document.getElementById('tk-date').value = t.date;
   openModal('mo-task');
 }
+
+// ══════════════════════════════════════════
+// AUTH SYSTEM
+// ══════════════════════════════════════════
+const AUTH_KEY = 'fv_accounts';   // danh sách accounts {user, passHash, color}
+const SESSION_KEY = 'fv_session'; // user đang login
+
+function hashPass(s){ let h=0; for(let i=0;i<s.length;i++) h=(Math.imul(31,h)+s.charCodeAt(i))|0; return h.toString(36); }
+function dataKey(user){ return 'fv3_' + user; }
+function getAccounts(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'[]'); }catch(e){ return []; } }
+function saveAccounts(arr){ localStorage.setItem(AUTH_KEY, JSON.stringify(arr)); }
+const AVATAR_COLORS = ['#3b5bdb','#7c3aed','#f97316','#00b4d8','#e63946','#2dc653'];
+function strColor(s){ let h=0; for(let c of s) h=(h*31+c.charCodeAt(0))&0xffff; return AVATAR_COLORS[h%AVATAR_COLORS.length]; }
+
+function initAuth(){
+  const session = localStorage.getItem(SESSION_KEY);
+  if(session){
+    const accs = getAccounts();
+    const acc = accs.find(a=>a.user===session);
+    if(acc){ loginAs(acc, false); return; }
+  }
+  showLoginScreen();
+}
+
+function showLoginScreen(){
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app-shell-wrap').style.display='none';
+  renderAccList();
+}
+
+function renderAccList(){
+  const accs = getAccounts();
+  const wrap = document.getElementById('login-acc-wrap');
+  const list = document.getElementById('login-acc-list');
+  if(accs.length===0){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  list.innerHTML = accs.map(a=>`
+    <div class="login-acc-item" onclick="quickLogin('${a.user}')">
+      <div class="login-acc-avatar" style="background:${strColor(a.user)}">${a.user[0].toUpperCase()}</div>
+      <div>
+        <div class="login-acc-name">${a.user}</div>
+        <div class="login-acc-sub">Bấm để điền nhanh</div>
+      </div>
+    </div>`).join('');
+}
+
+function quickLogin(user){
+  document.getElementById('li-user').value = user;
+  document.getElementById('li-pass').focus();
+}
+
+function doLogin(){
+  const user = document.getElementById('li-user').value.trim().toLowerCase();
+  const pass = document.getElementById('li-pass').value;
+  const err = document.getElementById('login-err');
+  if(!user||!pass){ err.textContent='Vui lòng nhập đầy đủ!'; return; }
+  const accs = getAccounts();
+  const acc = accs.find(a=>a.user===user);
+  if(!acc){ err.textContent='Tài khoản không tồn tại. Hãy tạo mới!'; return; }
+  if(acc.passHash !== hashPass(pass)){ err.textContent='Mật khẩu không đúng!'; return; }
+  err.textContent='';
+  loginAs(acc, true);
+}
+
+function showRegister(){
+  const user = prompt('Tên tài khoản (không dấu, không cách):');
+  if(!user) return;
+  const clean = user.trim().toLowerCase().replace(/\s+/g,'_');
+  if(!clean){ alert('Tên không hợp lệ!'); return; }
+  const accs = getAccounts();
+  if(accs.find(a=>a.user===clean)){ alert('Tên đã tồn tại!'); return; }
+  const pass = prompt('Mật khẩu:');
+  if(!pass){ return; }
+  const pass2 = prompt('Nhập lại mật khẩu:');
+  if(pass !== pass2){ alert('Mật khẩu không khớp!'); return; }
+  const newAcc = {user:clean, passHash:hashPass(pass)};
+  accs.push(newAcc);
+  saveAccounts(accs);
+  alert('✅ Tạo tài khoản thành công! Đăng nhập ngay.');
+  document.getElementById('li-user').value = clean;
+  document.getElementById('li-pass').value = pass;
+  renderAccList();
+  doLogin();
+}
+
+function loginAs(acc, saveSession){
+  // Load data của user này
+  const userDataKey = dataKey(acc.user);
+  const SCHED_VER = 'v20260309';
+  const defaultD = {
+    transactions:[], tasks:[], schedules:[
+      {"id":"s01","name":"Thức dậy","start":"05:00","end":"05:15","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Vệ sinh cá nhân, uống nước ấm"},
+      {"id":"s02","name":"Tập thể dục","start":"05:15","end":"05:45","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Vận động nhẹ, giãn cơ hoặc bài tập năng lượng"},
+      {"id":"s03","name":"Tắm rửa","start":"05:45","end":"06:15","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Thư giãn và làm sạch cơ thể sau khi tập"},
+      {"id":"s04","name":"Học Tiếng Anh","start":"06:15","end":"07:00","color":"#7c3aed","repeat":"daily","days":[],"category":"study","note":"Tập trung nghe/nói hoặc học từ vựng (45 phút chất lượng)"},
+      {"id":"s05","name":"Nấu ăn sáng + Trưa","start":"07:00","end":"07:45","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Nấu đồ sáng và chuẩn bị hộp cơm mang đi làm"},
+      {"id":"s06","name":"Ăn sáng & Chuẩn bị","start":"07:45","end":"08:30","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Ăn sáng thong thả, chuẩn bị đồ đạc và di chuyển đi làm"},
+      {"id":"s07","name":"Làm việc 1","start":"08:30","end":"12:00","color":"#3b5bdb","repeat":"daily","days":[],"category":"work","note":"Bắt đầu ca làm việc buổi sáng"},
+      {"id":"s08","name":"Nghỉ trưa","start":"12:00","end":"13:30","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Ăn trưa (30p) và ngủ trưa (45p) để hồi phục sức lực"},
+      {"id":"s09","name":"Làm việc 2","start":"13:30","end":"18:00","color":"#3b5bdb","repeat":"daily","days":[],"category":"work","note":"Hoàn thành các công việc tại văn phòng"},
+      {"id":"s10","name":"Di chuyển","start":"18:00","end":"18:30","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Di chuyển đến nơi học (tranh thủ ăn nhẹ/uống sữa)"},
+      {"id":"s11","name":"Đi học","start":"18:30","end":"21:00","color":"#7c3aed","repeat":"daily","days":[],"category":"study","note":"Tập trung tiếp thu kiến thức tại lớp"},
+      {"id":"s12","name":"Về nhà & Giặt đồ","start":"21:00","end":"21:30","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Về đến nhà, bỏ quần áo vào máy giặt ngay"},
+      {"id":"s13","name":"Nấu ăn & Ăn tối","start":"21:30","end":"22:15","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Nấu nhanh các món đơn giản và ăn tối muộn"},
+      {"id":"s14","name":"Phơi quần áo","start":"22:15","end":"22:30","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Máy giặt xong, tranh thủ phơi đồ trong 15 phút"},
+      {"id":"s15","name":"Học bài / Làm việc","start":"22:30","end":"23:45","color":"#7c3aed","repeat":"daily","days":[],"category":"study","note":"Ôn lại bài đã học hoặc xử lý các dự án cá nhân"},
+      {"id":"s16","name":"Vệ sinh & Đi ngủ","start":"23:45","end":"00:00","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Thả lỏng cơ thể, đi ngủ đúng 00:00"}
+    ], events:[], investments:[], investHistory:[], habits:[], checkins:{}, wakeGoal:'05:00', wakeSettings:{}
+  };
+
+  // Override D với data của user
+  const saved = localStorage.getItem(userDataKey);
+  Object.assign(D, defaultD);
+  if(saved){
+    try{
+      const parsed = JSON.parse(saved);
+      Object.assign(D, parsed);
+      if(parsed._schedVer !== SCHED_VER) D.schedules = defaultD.schedules;
+    }catch(e){}
+  }
+
+  // Override save để lưu theo user
+  window._currentUser = acc.user;
+  window.save = () => {
+    const obj = Object.assign({}, D, {_schedVer: SCHED_VER});
+    localStorage.setItem(dataKey(acc.user), JSON.stringify(obj));
+  };
+
+  if(saveSession) localStorage.setItem(SESSION_KEY, acc.user);
+
+  // Update UI
+  const color = strColor(acc.user);
+  document.getElementById('sb-user-avatar').style.background = color;
+  document.getElementById('sb-user-avatar').textContent = acc.user[0].toUpperCase();
+  document.getElementById('sb-user-name').textContent = acc.user;
+
+  // Show app
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-shell-wrap').style.display='flex';
+
+  // Re-render
+  setTimeout(()=>{ // Khởi động auth
+initAuth(); }, 100);
+}
+
+function doLogout(){
+  if(!confirm('Đăng xuất khỏi tài khoản?')) return;
+  localStorage.removeItem(SESSION_KEY);
+  window._currentUser = null;
+  // Reset D
+  D.transactions=[]; D.tasks=[]; D.habits=[]; D.checkins={}; D.investments=[]; D.investHistory=[]; D.events=[];
+  showLoginScreen();
+}
+
+// Cho phép Enter để login
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')) doLogin();
+});
+
 </script>
 
 <!-- Modal xem/sửa task -->
