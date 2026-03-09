@@ -783,12 +783,41 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 // DATA STORE
 // ════════════════════════════════════════
 let D = {
-  transactions:[], tasks:[], schedules:[], events:[],
+  transactions:[], tasks:[], schedules:[
+    {"id": "s01", "name": "Wake up", "start": "05:30", "end": "05:45", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Uống nước, vệ sinh cá nhân"},
+    {"id": "s02", "name": "Exercise", "start": "05:45", "end": "06:30", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Cardio / Stretching"},
+    {"id": "s03", "name": "Breakfast", "start": "06:30", "end": "07:00", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Ăn sáng nhẹ"},
+    {"id": "s04", "name": "Chuẩn bị đi làm", "start": "07:00", "end": "07:30", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Chuẩn bị đi làm"},
+    {"id": "s05", "name": "Di chuyển", "start": "07:30", "end": "08:00", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Di chuyển đi làm"},
+    {"id": "s06", "name": "Work Session 1", "start": "08:00", "end": "10:00", "color": "#5ca8ff", "repeat": "daily", "days": [], "category": "work", "note": "Công việc chính"},
+    {"id": "s07", "name": "Break", "start": "10:00", "end": "10:15", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Nghỉ 10–15 phút"},
+    {"id": "s08", "name": "Work Session 2", "start": "10:15", "end": "12:00", "color": "#5ca8ff", "repeat": "daily", "days": [], "category": "work", "note": "Hoàn thành task"},
+    {"id": "s09", "name": "Lunch", "start": "12:00", "end": "13:00", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Ăn trưa"},
+    {"id": "s10", "name": "Work Session 3", "start": "13:00", "end": "15:00", "color": "#5ca8ff", "repeat": "daily", "days": [], "category": "work", "note": "Tiếp tục công việc"},
+    {"id": "s11", "name": "Break", "start": "15:00", "end": "15:15", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Nghỉ ngắn"},
+    {"id": "s12", "name": "Work Session 4", "start": "15:15", "end": "17:30", "color": "#5ca8ff", "repeat": "daily", "days": [], "category": "work", "note": "Hoàn thành task"},
+    {"id": "s13", "name": "Chuẩn bị về", "start": "17:30", "end": "18:00", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Chuẩn bị về nhà"},
+    {"id": "s14", "name": "Dinner", "start": "18:00", "end": "19:00", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Ăn tối"},
+    {"id": "s15", "name": "Forex Study", "start": "19:00", "end": "20:00", "color": "#b06bff", "repeat": "daily", "days": [], "category": "study", "note": "Học lý thuyết / chiến lược"},
+    {"id": "s16", "name": "Backtest / Practice", "start": "20:00", "end": "21:00", "color": "#b06bff", "repeat": "daily", "days": [], "category": "study", "note": "Backtest MT5"},
+    {"id": "s17", "name": "Trading Review", "start": "21:00", "end": "21:30", "color": "#ff9f43", "repeat": "daily", "days": [], "category": "personal", "note": "Xem lại chart, journal"},
+    {"id": "s18", "name": "Relax", "start": "21:30", "end": "22:30", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Đọc sách / thư giãn"},
+    {"id": "s19", "name": "Sleep", "start": "22:30", "end": "05:30", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Ngủ đủ 7h"},
+  ], events:[],
   investments:[], investHistory:[],
   habits:[], checkins:{}, wakeGoal:'05:30', wakeSettings:{}
 };
 const save = () => localStorage.setItem('fv3', JSON.stringify(D));
-const load = () => { const s=localStorage.getItem('fv3'); if(s){ try{ D=JSON.parse(s); }catch(e){} } };
+const load = () => {
+  const s=localStorage.getItem('fv3');
+  if(s){ try{
+    const saved=JSON.parse(s);
+    // Giữ schedules mặc định nếu user chưa có schedules riêng
+    const defaultScheds = D.schedules;
+    Object.assign(D, saved);
+    if(!D.schedules||D.schedules.length===0) D.schedules=defaultScheds;
+  }catch(e){} }
+};
 load();
 
 // ── helpers ──
@@ -914,12 +943,7 @@ function deleteS(id){ D.schedules=D.schedules.filter(s=>s.id!==id); save(); rend
 // TASK BOX
 // ════════════════════════════════════════
 let tDate=today();
-// dateShift: cộng/trừ ngày an toàn, không bị lỗi timezone
-function dateShift(ds, delta){
-  const [y,m,d] = ds.split('-').map(Number);
-  const dt = new Date(y, m-1, d+delta);
-  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
-}
+function dateShift(ds,delta){ const [y,m,d]=ds.split('-').map(Number); const dt=new Date(y,m-1,d+delta); return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
 function tPrev(){ tDate=dateShift(tDate,-1); renderTaskBox(); }
 function tNext(){ tDate=dateShift(tDate,+1); renderTaskBox(); }
 function tToday(){ tDate=today(); renderTaskBox(); }
