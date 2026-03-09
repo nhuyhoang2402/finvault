@@ -120,7 +120,7 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
 .ov-grid{display:grid;grid-template-columns:3fr 2fr;gap:16px;}
 
 /* Timeline */
-.tl-wrap{overflow-y:auto;max-height:600px;padding-right:3px;}
+.tl-wrap{overflow-y:auto;max-height:calc(100vh - 280px);min-height:200px;padding-right:3px;}
 .tl-row{display:flex;align-items:flex-start;gap:8px;min-height:46px;position:relative;}
 .tl-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);width:34px;flex-shrink:0;padding-top:3px;text-align:right;}
 .tl-lane{flex:1;border-top:1px solid var(--border);position:relative;min-height:46px;}
@@ -366,9 +366,9 @@ body{overflow:hidden;height:100vh;}
 .sb-date-full{font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
 .sb-nav{padding:12px 12px;flex:1;}
 .sb-nav-label{font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:4px 8px 8px;}
-.sb-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:all .2s;margin-bottom:3px;}
-.sb-item:hover{background:var(--s2);color:var(--text);}
-.sb-item.active{background:var(--blue-dim);color:var(--blue);}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text3);transition:all .2s;margin-bottom:2px;background:transparent;}
+.sb-item:hover{background:var(--s2);color:var(--text2);}
+.sb-item.active{background:var(--blue-dim);color:var(--blue);font-weight:700;}
 .sb-item.active .sb-icon{filter:none;}
 .sb-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
 .sb-bottom{padding:16px;border-top:1px solid var(--border);margin-top:auto;}
@@ -434,7 +434,6 @@ body{overflow:hidden;height:100vh;}
   </div>
 
   <nav class="sb-nav">
-    <div class="sb-nav-label">Menu chính</div>
     <div class="sb-item active" onclick="switchMain('personal',this)" data-panel="personal">
       <span class="sb-icon">🏠</span><span>Quản Lý Cá Nhân</span>
     </div>
@@ -486,7 +485,7 @@ body{overflow:hidden;height:100vh;}
             <button class="btn bm" style="font-size:10px;padding:4px 10px;" onclick="openModal('mo-sched')">+ Thêm</button>
           </div>
         </div>
-        <div class="cb" style="padding:12px 14px;"><div class="tl-wrap" id="tl-wrap"></div></div>
+        <div class="cb" style="padding:10px 12px;"><div class="tl-wrap" id="tl-wrap"></div></div>
       </div>
       <!-- Task box -->
       <div class="card">
@@ -937,15 +936,16 @@ let D = {
   investments:[], investHistory:[],
   habits:[], checkins:{}, wakeGoal:'05:30', wakeSettings:{}
 };
-const save = () => localStorage.setItem('fv3', JSON.stringify(D));
+const SCHED_VER = 'v20260309'; // tăng version này mỗi khi đổi lịch mặc định
+const save = () => { const obj=Object.assign({},D,{_schedVer:SCHED_VER}); localStorage.setItem('fv3', JSON.stringify(obj)); };
 const load = () => {
   const s=localStorage.getItem('fv3');
   if(s){ try{
     const saved=JSON.parse(s);
-    // Giữ schedules mặc định nếu user chưa có schedules riêng
-    const defaultScheds = D.schedules;
+    const defaultScheds = D.schedules; // lịch mới từ code
     Object.assign(D, saved);
-    if(!D.schedules||D.schedules.length===0) D.schedules=defaultScheds;
+    // Nếu version lịch khác → dùng lịch mới từ code, giữ data khác
+    if(saved._schedVer !== SCHED_VER) D.schedules = defaultScheds;
   }catch(e){} }
 };
 load();
