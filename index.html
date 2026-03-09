@@ -60,19 +60,19 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
 .cb{padding:16px;}
 
 /* ── STAT CARDS ── */
-.sg{display:grid;gap:12px;}
+.sg{display:grid;gap:10px;}
 .sg4{grid-template-columns:repeat(4,1fr);}
 .sg5{grid-template-columns:repeat(5,1fr);}
 .sg3{grid-template-columns:repeat(3,1fr);}
-.sc{background:var(--s1);border:1px solid var(--border);border-radius:13px;padding:15px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;box-shadow:0 2px 10px rgba(59,91,219,0.05);}
-.sc:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 6px 20px rgba(59,91,219,0.1);}
+.sc{background:var(--s1);border:1.5px solid var(--border);border-radius:14px;padding:11px 14px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(59,91,219,0.07);}
+.sc:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 6px 20px rgba(59,91,219,0.13);}
 .sc.acc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--mint),transparent);}
 .sc.acc-gold::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);}
 .sc.acc-purple::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),transparent);}
-.sl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;}
-.sv{font-family:var(--mono);font-size:19px;font-weight:500;margin-bottom:3px;}
+.sl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+.sv{font-family:var(--mono);font-size:17px;font-weight:700;margin-bottom:2px;}
 .ss{font-size:10px;color:var(--text3);}
-.si{position:absolute;top:12px;right:12px;font-size:17px;opacity:.3;}
+.si{position:absolute;top:10px;right:10px;font-size:15px;opacity:.2;}
 .up{color:var(--mint);} .dn{color:var(--red);} .gl{color:var(--gold);} .bl{color:var(--blue);} .pl{color:var(--purple);}
 
 /* ── BUTTONS ── */
@@ -120,7 +120,7 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
 .ov-grid{display:grid;grid-template-columns:3fr 2fr;gap:16px;}
 
 /* Timeline */
-.tl-wrap{overflow-y:auto;max-height:500px;padding-right:3px;}
+.tl-wrap{overflow-y:auto;max-height:600px;padding-right:3px;}
 .tl-row{display:flex;align-items:flex-start;gap:8px;min-height:46px;position:relative;}
 .tl-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);width:34px;flex-shrink:0;padding-top:3px;text-align:right;}
 .tl-lane{flex:1;border-top:1px solid var(--border);position:relative;min-height:46px;}
@@ -325,7 +325,7 @@ body.light .rin{background:#eaeeff;border-color:#c5cfe8;color:#1a2035;}
 /* ── Timeline Mẫu 3: Block Cards ── */
 .tl-m3-wrap{display:flex;flex-direction:column;gap:5px;padding:4px 0;}
 .tl-m3-slot{display:grid;grid-template-columns:42px 1fr;gap:7px;align-items:center;}
-.tl-m3-time{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:right;line-height:1.4;}
+.tl-m3-time{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text2);text-align:right;line-height:1.4;}
 .tl-m3-time.tl-now{color:var(--blue);font-weight:800;}
 .tl-m3-block{border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .22s;border:1.5px solid transparent;position:relative;overflow:hidden;}
 .tl-m3-block:hover{transform:translateX(3px);}
@@ -338,38 +338,121 @@ body.light .rin{background:#eaeeff;border-color:#c5cfe8;color:#1a2035;}
 .tl-m3-block.tl-nochk{cursor:default;opacity:.6;}
 .tl-m3-block.tl-nochk:hover{transform:none;}
 .tl-m3-chk{width:22px;height:22px;border-radius:6px;border:2px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all .2s;background:rgba(255,255,255,0.35);}
-.tl-m3-chk.chk-done{background:#fff;color:var(--mint);border-color:#fff;font-weight:800;box-shadow:0 2px 6px rgba(0,200,150,0.25);}
+.tl-m3-chk.chk-done{background:#fff;color:#0ea5e9;border-color:#fff;font-weight:800;box-shadow:0 2px 8px rgba(14,165,233,0.3);}
 .tl-m3-chk.chk-miss{background:rgba(240,74,74,.12);border-color:rgba(240,74,74,.4);color:var(--red);font-weight:800;}
 .tl-m3-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
 .tl-m3-info{flex:1;min-width:0;}
-.tl-m3-name{font-size:12px;font-weight:700;transition:all .2s;}
-.tl-m3-sub{font-size:10px;opacity:.7;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tl-m3-name{font-size:13px;font-weight:700;transition:all .2s;}
+.tl-m3-sub{font-size:11px;opacity:.8;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .tl-m3-right{display:flex;align-items:center;gap:4px;flex-shrink:0;}
-.tl-m3-dur{font-family:var(--mono);font-size:9px;opacity:.6;}
+.tl-m3-dur{font-family:var(--mono);font-size:11px;font-weight:700;opacity:1;color:var(--text2);background:rgba(0,0,0,0.06);padding:2px 7px;border-radius:6px;}
 .tl-m3-pts{font-size:10px;font-weight:800;padding:2px 7px;border-radius:7px;background:rgba(255,255,255,0.4);}
 .tl-m3-miss-tag{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:800;color:var(--red);background:rgba(240,74,74,.1);padding:2px 7px;border-radius:8px;}
 @keyframes tl-pulse{0%,100%{box-shadow:0 0 0 0 rgba(240,74,74,0);}50%{box-shadow:0 0 0 5px rgba(240,74,74,0.08);}}
 .tl-m3-block.tl-missed{animation:tl-pulse 2.5s ease-in-out infinite;}
+
+/* ══ APP SHELL: SIDEBAR LAYOUT ══ */
+body{overflow:hidden;height:100vh;}
+.app-shell{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-width:240px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;z-index:100;box-shadow:2px 0 16px rgba(59,91,219,0.06);}
+.sb-logo{display:flex;align-items:center;gap:12px;padding:22px 20px 16px;border-bottom:1px solid var(--border);}
+.sb-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--mint),var(--blue));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.sb-logo-name{font-size:16px;font-weight:800;color:var(--blue);letter-spacing:.5px;}
+.sb-logo-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+.sb-date-box{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--s2);}
+.sb-date-day{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.sb-date-full{font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
+.sb-nav{padding:12px 12px;flex:1;}
+.sb-nav-label{font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:4px 8px 8px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:all .2s;margin-bottom:3px;}
+.sb-item:hover{background:var(--s2);color:var(--text);}
+.sb-item.active{background:var(--blue-dim);color:var(--blue);}
+.sb-item.active .sb-icon{filter:none;}
+.sb-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+.sb-bottom{padding:16px;border-top:1px solid var(--border);margin-top:auto;}
+.theme-btn{width:100%;padding:9px;border-radius:10px;border:1.5px solid var(--border);background:var(--s2);font-family:var(--sans);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.theme-btn:hover{border-color:var(--blue);color:var(--blue);}
+
+/* MAIN CONTENT */
+.main-content{flex:1;overflow-y:auto;height:100vh;background:var(--bg);}
+
+/* Hide old topbar/main-tabs */
+.topbar{display:none!important;}
+.main-tabs{display:none!important;}
+
+/* Panels start from top */
+.mpanel{display:none;} .mpanel.active{display:block;}
+
+/* Sub-tabs spacing */
+.sub-tabs{padding:16px 24px 0;}
+
+
+/* ── Button đồng bộ Edmicro ── */
+.btn{border-radius:20px!important;font-weight:700!important;letter-spacing:.2px;}
+.bm{background:var(--mint)!important;color:#fff!important;}
+.bb{background:var(--blue)!important;color:#fff!important;}
+.bg2{background:var(--gold)!important;color:#fff!important;}
+.bp{background:var(--purple)!important;color:#fff!important;}
+.bgh{background:var(--s3)!important;color:var(--text2)!important;border:1.5px solid var(--border)!important;border-radius:20px!important;}
+.bgh:hover{background:var(--blue-dim)!important;color:var(--blue)!important;border-color:var(--blue)!important;}
+.brd{border-radius:20px!important;}
+/* Streak pill */
+.streak-pill{border-radius:20px;font-size:12px;font-weight:700;}
+/* Sidebar streak */
+.sidebar .streak-pill{background:rgba(0,200,150,0.1);border:1px solid rgba(0,200,150,0.2);color:var(--mint);padding:6px 14px;}
+
+
+/* ── Box visibility fix ── */
+.card{border:1.5px solid #d8dff0!important;box-shadow:0 3px 16px rgba(59,91,219,0.08)!important;}
+.cb{border-top:1px solid #e3e8f4;}
+.sc{border:1.5px solid #d8dff0!important;}
+.sc:hover{border-color:#3b5bdb!important;}
+
+/* Health category color in timeline */
+.tl-health-color{color:#0ea5e9;}
 </style>
 </head>
 <body>
-<div class="glow-a"></div><div class="glow-b"></div>
+<div class="app-shell">
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="logo"><div class="logo-icon">💎</div>FIN<span>VAULT</span></div>
-  <div class="topbar-r"><button class="theme-btn" onclick="toggleTheme()" id="theme-btn" title="Đổi màu">🌙</button>
-    <div class="streak-pill" id="streak-pill">🔥 0 ngày</div>
-    <div class="topbar-date" id="topbar-date"></div>
+<!-- ══ SIDEBAR TRÁI ══ -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">💎</div>
+    <div>
+      <div class="sb-logo-name">FinVault</div>
+      <div class="sb-logo-sub">Quản lý cá nhân</div>
+    </div>
+  </div>
+
+  <div class="sb-date-box">
+    <div class="sb-date-day" id="sb-date-day"></div>
+    <div class="sb-date-full" id="sb-date-full"></div>
+    <div class="streak-pill" id="streak-pill" style="margin-top:8px;justify-content:center;">🔥 0 ngày</div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-nav-label">Menu chính</div>
+    <div class="sb-item active" onclick="switchMain('personal',this)" data-panel="personal">
+      <span class="sb-icon">🏠</span><span>Quản Lý Cá Nhân</span>
+    </div>
+    <div class="sb-item" onclick="switchMain('invest',this)" data-panel="invest">
+      <span class="sb-icon">📈</span><span>Đầu Tư</span>
+    </div>
+    <div class="sb-item" onclick="switchMain('discipline',this)" data-panel="discipline">
+      <span class="sb-icon">💪</span><span>Kỷ Luật</span>
+    </div>
+  </nav>
+
+  <div class="sb-bottom">
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn" title="Đổi màu">🌙 Đổi theme</button>
   </div>
 </div>
 
-<!-- MAIN TABS -->
-<div class="main-tabs">
-  <div class="mtab active" onclick="switchMain('personal',this)">🏠 Quản Lý Cá Nhân</div>
-  <div class="mtab t2" onclick="switchMain('invest',this)">📈 Đầu Tư</div>
-  <div class="mtab t3" onclick="switchMain('discipline',this)">💪 Kỷ Luật</div>
-</div>
+<!-- ══ CONTENT PHẢI ══ -->
+<div class="main-content">
 
 <!-- ══════════════ TAB 1: CÁ NHÂN ══════════════ -->
 <div class="mpanel active" id="mp-personal">
@@ -834,25 +917,22 @@ body.light .rin{background:#eaeeff;border-color:#c5cfe8;color:#1a2035;}
 // ════════════════════════════════════════
 let D = {
   transactions:[], tasks:[], schedules:[
-    {"id": "s01", "name": "Wake up", "start": "05:30", "end": "05:45", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Uống nước, vệ sinh cá nhân"},
-    {"id": "s02", "name": "Exercise", "start": "05:45", "end": "06:30", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Cardio / Stretching"},
-    {"id": "s03", "name": "Breakfast", "start": "06:30", "end": "07:00", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Ăn sáng nhẹ"},
-    {"id": "s04", "name": "Chuẩn bị đi làm", "start": "07:00", "end": "07:30", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Chuẩn bị đi làm"},
-    {"id": "s05", "name": "Di chuyển", "start": "07:30", "end": "08:00", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Di chuyển đi làm"},
-    {"id": "s06", "name": "Work Session 1", "start": "08:00", "end": "10:00", "color": "#5ca8ff", "repeat": "daily", "days": [], "category": "work", "note": "Công việc chính"},
-    {"id": "s07", "name": "Break", "start": "10:00", "end": "10:15", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Nghỉ 10–15 phút"},
-    {"id": "s08", "name": "Work Session 2", "start": "10:15", "end": "12:00", "color": "#5ca8ff", "repeat": "daily", "days": [], "category": "work", "note": "Hoàn thành task"},
-    {"id": "s09", "name": "Lunch", "start": "12:00", "end": "13:00", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Ăn trưa"},
-    {"id": "s10", "name": "Work Session 3", "start": "13:00", "end": "15:00", "color": "#5ca8ff", "repeat": "daily", "days": [], "category": "work", "note": "Tiếp tục công việc"},
-    {"id": "s11", "name": "Break", "start": "15:00", "end": "15:15", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Nghỉ ngắn"},
-    {"id": "s12", "name": "Work Session 4", "start": "15:15", "end": "17:30", "color": "#5ca8ff", "repeat": "daily", "days": [], "category": "work", "note": "Hoàn thành task"},
-    {"id": "s13", "name": "Chuẩn bị về", "start": "17:30", "end": "18:00", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Chuẩn bị về nhà"},
-    {"id": "s14", "name": "Dinner", "start": "18:00", "end": "19:00", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Ăn tối"},
-    {"id": "s15", "name": "Forex Study", "start": "19:00", "end": "20:00", "color": "#b06bff", "repeat": "daily", "days": [], "category": "study", "note": "Học lý thuyết / chiến lược"},
-    {"id": "s16", "name": "Backtest / Practice", "start": "20:00", "end": "21:00", "color": "#b06bff", "repeat": "daily", "days": [], "category": "study", "note": "Backtest MT5"},
-    {"id": "s17", "name": "Trading Review", "start": "21:00", "end": "21:30", "color": "#ff9f43", "repeat": "daily", "days": [], "category": "personal", "note": "Xem lại chart, journal"},
-    {"id": "s18", "name": "Relax", "start": "21:30", "end": "22:30", "color": "#f5c842", "repeat": "daily", "days": [], "category": "personal", "note": "Đọc sách / thư giãn"},
-    {"id": "s19", "name": "Sleep", "start": "22:30", "end": "05:30", "color": "#3dffa0", "repeat": "daily", "days": [], "category": "health", "note": "Ngủ đủ 7h"},
+    {"id": "s01", "name": "Thức dậy",         "start": "05:00", "end": "05:15", "color": "#0ea5e9", "repeat": "daily", "days": [], "category": "health",   "note": "Vệ sinh cá nhân, uống nước ấm"},
+    {"id": "s02", "name": "Tập thể dục",       "start": "05:15", "end": "05:45", "color": "#0ea5e9", "repeat": "daily", "days": [], "category": "health",   "note": "Vận động nhẹ, giãn cơ hoặc bài tập năng lượng"},
+    {"id": "s03", "name": "Tắm rửa",           "start": "05:45", "end": "06:15", "color": "#0ea5e9", "repeat": "daily", "days": [], "category": "health",   "note": "Thư giãn và làm sạch cơ thể sau khi tập"},
+    {"id": "s04", "name": "Học Tiếng Anh",     "start": "06:15", "end": "07:00", "color": "#7c3aed", "repeat": "daily", "days": [], "category": "study",    "note": "Tập trung nghe/nói hoặc học từ vựng (45 phút chất lượng)"},
+    {"id": "s05", "name": "Nấu ăn sáng + Trưa","start": "07:00", "end": "07:45", "color": "#f5a623", "repeat": "daily", "days": [], "category": "personal", "note": "Nấu đồ sáng và chuẩn bị hộp cơm mang đi làm"},
+    {"id": "s06", "name": "Ăn sáng & Chuẩn bị","start": "07:45", "end": "08:30", "color": "#f5a623", "repeat": "daily", "days": [], "category": "personal", "note": "Ăn sáng thong thả, chuẩn bị đồ đạc và di chuyển đi làm"},
+    {"id": "s07", "name": "Làm việc 1",        "start": "08:30", "end": "12:00", "color": "#3b5bdb", "repeat": "daily", "days": [], "category": "work",     "note": "Bắt đầu ca làm việc buổi sáng"},
+    {"id": "s08", "name": "Nghỉ trưa",         "start": "12:00", "end": "13:30", "color": "#0ea5e9", "repeat": "daily", "days": [], "category": "health",   "note": "Ăn trưa (30p) và ngủ trưa (45p) để hồi phục sức lực"},
+    {"id": "s09", "name": "Làm việc 2",        "start": "13:30", "end": "18:00", "color": "#3b5bdb", "repeat": "daily", "days": [], "category": "work",     "note": "Hoàn thành các công việc tại văn phòng"},
+    {"id": "s10", "name": "Di chuyển",         "start": "18:00", "end": "18:30", "color": "#f5a623", "repeat": "daily", "days": [], "category": "personal", "note": "Di chuyển đến nơi học (tranh thủ ăn nhẹ/uống sữa)"},
+    {"id": "s11", "name": "Đi học",            "start": "18:30", "end": "21:00", "color": "#7c3aed", "repeat": "daily", "days": [], "category": "study",    "note": "Tập trung tiếp thu kiến thức tại lớp"},
+    {"id": "s12", "name": "Về nhà & Giặt đồ", "start": "21:00", "end": "21:30", "color": "#f5a623", "repeat": "daily", "days": [], "category": "personal", "note": "Về đến nhà, bỏ quần áo vào máy giặt ngay"},
+    {"id": "s13", "name": "Nấu ăn & Ăn tối",  "start": "21:30", "end": "22:15", "color": "#f5a623", "repeat": "daily", "days": [], "category": "personal", "note": "Nấu nhanh các món đơn giản và ăn tối muộn"},
+    {"id": "s14", "name": "Phơi quần áo",      "start": "22:15", "end": "22:30", "color": "#f5a623", "repeat": "daily", "days": [], "category": "personal", "note": "Máy giặt xong, tranh thủ phơi đồ trong 15 phút"},
+    {"id": "s15", "name": "Học bài / Làm việc","start": "22:30", "end": "23:45", "color": "#7c3aed", "repeat": "daily", "days": [], "category": "study",    "note": "Ôn lại bài đã học hoặc xử lý các dự án cá nhân"},
+    {"id": "s16", "name": "Vệ sinh & Đi ngủ",  "start": "23:45", "end": "00:00", "color": "#0ea5e9", "repeat": "daily", "days": [], "category": "health",   "note": "Thả lỏng cơ thể, đi ngủ đúng 00:00"},
   ], events:[],
   investments:[], investHistory:[],
   habits:[], checkins:{}, wakeGoal:'05:30', wakeSettings:{}
@@ -882,7 +962,14 @@ const CATC  = {'Lương':'var(--mint)','Thưởng':'var(--gold)','Freelance':'va
 const ITYPES = {stock:{label:'Chứng Khoán',icon:'📊',cls:'i-stock'},crypto:{label:'Crypto',icon:'🪙',cls:'i-crypto'},gold:{label:'Vàng',icon:'🥇',cls:'i-gold'},save:{label:'Tiết Kiệm',icon:'🏦',cls:'i-save'},re:{label:'Bất Động Sản',icon:'🏠',cls:'i-re'}};
 
 // topbar
-function setTopbarDate(){ document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('vi-VN',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'}); }
+function setTopbarDate(){
+  const now=new Date();
+  const dayEl=document.getElementById('sb-date-day');
+  const fullEl=document.getElementById('sb-date-full');
+  if(dayEl) dayEl.textContent=now.toLocaleDateString('vi-VN',{weekday:'long'});
+  if(fullEl) fullEl.textContent=now.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const old=document.getElementById('topbar-date'); if(old) old.textContent=now.toLocaleDateString('vi-VN',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'});
+}
 setTopbarDate();
 
 // ════════════════════════════════════════
@@ -964,7 +1051,7 @@ function tlGetDur(s,e){ let sm=tlToMin(s),em=tlToMin(e); if(em<=sm) em+=1440; co
 function tlBlockStatus(s){ const now=new Date().getHours()*60+new Date().getMinutes(); let sm=tlToMin(s.start||'00:00'),em=tlToMin(s.end||s.start||'00:00'); if(em<=sm){ return {isActive:now>=sm||now<em,isPast:!(now>=sm||now<em)}; } return {isActive:now>=sm&&now<em,isPast:now>=em}; }
 function tlToggle(id){ TL_ST.checked[id]=!TL_ST.checked[id]; tlSaveState(TL_ST); renderTimeline(); }
 const catIconTl={'work':'💼','health':'🌿','study':'📚','personal':'⚡'};
-const catBgTl={'work':'rgba(59,91,219,0.09)','health':'rgba(0,200,150,0.09)','study':'rgba(124,58,237,0.09)','personal':'rgba(245,166,35,0.09)'};
+const catBgTl={'work':'rgba(59,91,219,0.09)','health':'rgba(14,165,233,0.1)','study':'rgba(124,58,237,0.09)','personal':'rgba(245,166,35,0.09)'};
 
 function renderTimeline(){
   if(TL_ST.date!==tlTodayStr()){ TL_ST={date:tlTodayStr(),checked:{}}; tlSaveState(TL_ST); }
@@ -1630,11 +1717,11 @@ function openTaskDetail(id){
   const rw = document.getElementById('td-reason-wrap');
   if(t.reason){ rw.style.display='block'; rw.textContent='💬 Lý do: '+t.reason; }
   else { rw.style.display='none'; }
-  openModal('mo-task-detail');
+  document.getElementById('mo-task-detail').classList.add('open');
 }
 function editTaskFromDetail(){
   const t = D.tasks.find(x=>x.id===viewingTaskId); if(!t) return;
-  closeModal('mo-task-detail');
+  document.getElementById('mo-task-detail').classList.remove('open');
   // fill modal edit
   editingTask = t.id;
   document.getElementById('tk-name').value = t.name;
@@ -1647,28 +1734,33 @@ function editTaskFromDetail(){
 </script>
 
 <!-- Modal xem/sửa task -->
-<div class="modal" id="mo-task-detail">
-  <div class="mbox" style="max-width:420px;">
-    <div class="mh"><div class="mt" id="td-title">Chi Tiết Task</div><button class="mcl" onclick="closeModal('mo-task-detail')">✕</button></div>
-    <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span id="td-pri-dot" style="width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;"></span>
-        <span id="td-name" style="font-weight:700;font-size:15px;"></span>
+<div class="mo" id="mo-task-detail">
+  <div class="mbox" style="width:440px;">
+    <div class="mh">
+      <div class="mt2">📋 Chi Tiết Task</div>
+      <button class="mx" onclick="closeModal('mo-task-detail')">✕</button>
+    </div>
+    <div class="mb2">
+      <div style="display:flex;align-items:center;gap:10px;padding:4px 0;">
+        <span id="td-pri-dot" style="width:12px;height:12px;border-radius:50%;display:inline-block;flex-shrink:0;box-shadow:0 0 0 3px rgba(0,0,0,.08);"></span>
+        <span id="td-name" style="font-weight:800;font-size:16px;"></span>
       </div>
-      <div style="display:flex;gap:16px;font-size:12px;color:var(--text2);">
-        <span>🕐 <span id="td-time"></span></span>
-        <span>📅 <span id="td-date"></span></span>
+      <div style="display:flex;gap:14px;font-size:12px;color:var(--text2);flex-wrap:wrap;">
+        <span>🕐 <span id="td-time" style="font-weight:600;"></span></span>
+        <span>📅 <span id="td-date" style="font-weight:600;"></span></span>
         <span id="td-status-badge"></span>
       </div>
-      <div id="td-content-wrap" style="background:var(--s2);border-radius:8px;padding:10px;font-size:12px;color:var(--text2);min-height:40px;line-height:1.6;"></div>
-      <div id="td-reason-wrap" style="display:none;background:var(--red-dim);border-radius:8px;padding:10px;font-size:12px;color:var(--red);"></div>
-      <div style="display:flex;gap:8px;margin-top:4px;">
-        <button class="btn bgh" onclick="closeModal('mo-task-detail')" style="flex:1;">Đóng</button>
-        <button class="btn bb" onclick="editTaskFromDetail()" style="flex:1;">✏️ Sửa</button>
-      </div>
+      <div id="td-content-wrap" style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;color:var(--text2);min-height:48px;line-height:1.7;"></div>
+      <div id="td-reason-wrap" style="display:none;background:rgba(240,74,74,0.06);border:1px solid rgba(240,74,74,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--red);"></div>
+    </div>
+    <div class="mf">
+      <button class="btn bgh" onclick="closeModal('mo-task-detail')" style="flex:1;">Đóng</button>
+      <button class="btn bb" onclick="editTaskFromDetail()" style="flex:1;">✏️ Sửa</button>
     </div>
   </div>
 </div>
 
+</div><!-- end main-content -->
+</div><!-- end app-shell -->
 </body>
 </html>
