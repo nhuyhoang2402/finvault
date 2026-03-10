@@ -1983,6 +1983,19 @@ function saveAccounts(arr){ localStorage.setItem(AUTH_KEY, JSON.stringify(arr));
 const AVATAR_COLORS = ['#3b5bdb','#7c3aed','#f97316','#00b4d8','#e63946','#2dc653'];
 function strColor(s){ let h=0; for(let c of s) h=(h*31+c.charCodeAt(0))&0xffff; return AVATAR_COLORS[h%AVATAR_COLORS.length]; }
 
+function switchAuthTab(tab){
+  const isLogin = tab==='login';
+  document.getElementById('login-form-wrap').style.display = isLogin?'block':'none';
+  document.getElementById('reg-form-wrap').style.display   = isLogin?'none':'block';
+  const lb=document.getElementById('tab-login-btn'), rb=document.getElementById('tab-reg-btn');
+  if(lb){ lb.style.background=isLogin?'#3b5bdb':'transparent'; lb.style.color=isLogin?'#fff':'#9aa3c2'; lb.style.fontWeight=isLogin?'700':'600'; }
+  if(rb){ rb.style.background=isLogin?'transparent':'#3b5bdb'; rb.style.color=isLogin?'#9aa3c2':'#fff'; rb.style.fontWeight=isLogin?'600':'700'; }
+  const le=document.getElementById('login-err'), re=document.getElementById('reg-err');
+  if(le) le.textContent=''; if(re) re.textContent='';
+}
+function showRegister(){ switchAuthTab('register'); }
+
+
 const supa = supabase.createClient('https://vfmredkgvhqibrehzrdi.supabase.co', 'sb_publishable_VTY_-EFduaEmZrrkkFHbvg_liLLAPYh');
 
 async function initAuth(){
