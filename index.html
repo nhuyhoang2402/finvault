@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Life Master — Quản Lý Tài Chính</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
@@ -546,7 +547,7 @@ body{overflow:hidden;height:100vh;margin:0;}
 </head>
 <body>
 <!-- ══ LOGIN SCREEN ══ -->
-<div class="login-screen hidden" id="login-screen">
+<div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo">
       <div class="login-logo-icon" style="background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(52,211,153,0.2));border:1px solid rgba(167,139,250,0.3);"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">LM</div></div>
@@ -1982,7 +1983,10 @@ function saveAccounts(arr){ localStorage.setItem(AUTH_KEY, JSON.stringify(arr));
 const AVATAR_COLORS = ['#3b5bdb','#7c3aed','#f97316','#00b4d8','#e63946','#2dc653'];
 function strColor(s){ let h=0; for(let c of s) h=(h*31+c.charCodeAt(0))&0xffff; return AVATAR_COLORS[h%AVATAR_COLORS.length]; }
 
+const supa = supabase.createClient('https://vfmredkgvhqibrehzrdi.supabase.co', 'sb_publishable_VTY_-EFduaEmZrrkkFHbvg_liLLAPYh');
+
 async function initAuth(){
+  if(typeof supabase === 'undefined'){ showLoginScreen(); return; }
   const { data:{ session } } = await supa.auth.getSession();
   if(session){
     await loadUserData(session.user);
