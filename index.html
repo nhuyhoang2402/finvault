@@ -2108,14 +2108,19 @@ async function loadUserData(supaUser){
   let saveTimer = null;
   window.save = () => {
     const obj = Object.assign({}, D, {_schedVer: SCHED_VER});
-    // Lưu local trước để nhanh
     localStorage.setItem('fv3_' + window._currentUser, JSON.stringify(obj));
-    // Sau đó sync lên cloud
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async () => {
-      await supa.from('user_data').upsert({ user_id: uid, data: obj, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+      const { error: saveErr } = await supa.from('user_data').upsert(
+        { user_id: uid, data: obj, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id' }
+      );
+      if(saveErr) console.error('❌ Save error:', saveErr.message);
+      else console.log('✅ Data saved to Supabase');
     }, 1500);
   };
+  // Lưu ngay lần đầu khi đăng nhập
+  window.save();
 
   // Update UI sidebar
   const color = strColor(window._currentUser);
