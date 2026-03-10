@@ -2015,8 +2015,8 @@ async function doLogin(){
   const err  = document.getElementById('login-err');
   if(!user||!pass){ err.textContent='Vui lòng nhập đầy đủ!'; return; }
 
-  // Email = username@finvault.local — không cần tra localStorage
-  const email = user + '@finvault.local';
+  // Email = username@lifemaster.app — không cần tra localStorage
+  const email = user + '@lifemaster.app';
   const { error } = await supa.auth.signInWithPassword({ email, password: pass });
   if(error){ err.textContent='Tài khoản không đúng hoặc chưa đăng ký!'; return; }
   err.textContent='';
@@ -2037,7 +2037,7 @@ async function doRegister(){
   if(accs.find(a=>a.user===user)){ err.textContent='Tên đã tồn tại!'; return; }
 
   // Dùng email giả để đăng ký Supabase Auth
-  const email = user + '@finvault.local';
+  const email = user + '@lifemaster.app';
   const { error } = await supa.auth.signUp({ email, password: pass });
   if(error){ err.textContent='Lỗi: ' + error.message; return; }
 
