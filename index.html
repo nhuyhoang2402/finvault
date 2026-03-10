@@ -1983,6 +1983,18 @@ function saveAccounts(arr){ localStorage.setItem(AUTH_KEY, JSON.stringify(arr));
 const AVATAR_COLORS = ['#3b5bdb','#7c3aed','#f97316','#00b4d8','#e63946','#2dc653'];
 function strColor(s){ let h=0; for(let c of s) h=(h*31+c.charCodeAt(0))&0xffff; return AVATAR_COLORS[h%AVATAR_COLORS.length]; }
 
+function showLoginScreen(){
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app-shell-wrap').style.display='none';
+  switchAuthTab('login');
+}
+
+function showApp(){
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-shell-wrap').style.display='flex';
+}
+
+
 function switchAuthTab(tab){
   const isLogin = tab==='login';
   document.getElementById('login-form-wrap').style.display = isLogin?'block':'none';
@@ -2000,7 +2012,11 @@ const supa = supabase.createClient('https://vfmredkgvhqibrehzrdi.supabase.co', '
 
 async function initAuth(){
   if(typeof supabase === 'undefined'){ showLoginScreen(); return; }
-  const { data:{ session } } = await supa.auth.getSession();
+  let session;
+  try {
+    const { data } = await supa.auth.getSession();
+    session = data.session;
+  } catch(e){ showLoginScreen(); return; }
   if(session){
     await loadUserData(session.user);
   } else {
@@ -2017,11 +2033,17 @@ async function doLogin(){
 
   // Email = username@lifemaster.app — không cần tra localStorage
   const email = user + '@lifemaster.app';
-  const { error } = await supa.auth.signInWithPassword({ email, password: pass });
-  if(error){ err.textContent='Tài khoản không đúng hoặc chưa đăng ký!'; return; }
+  const { data: loginData, error } = await supa.auth.signInWithPassword({ email, password: pass });
+  if(error){
+    if(error.message.toLowerCase().includes('email') || error.message.toLowerCase().includes('confirm')){
+      err.textContent='⚠️ Tài khoản chưa xác nhận. Vào Supabase → Users → Confirm email!';
+    } else {
+      err.textContent='Tài khoản không đúng hoặc chưa đăng ký!';
+    }
+    return;
+  }
   err.textContent='';
-  const { data:{ session } } = await supa.auth.getSession();
-  await loadUserData(session.user);
+  await loadUserData(loginData.user);
 }
 
 // ── Đăng ký ──
@@ -2038,20 +2060,26 @@ async function doRegister(){
 
   // Dùng email giả để đăng ký Supabase Auth
   const email = user + '@lifemaster.app';
-  const { error } = await supa.auth.signUp({ email, password: pass });
+  const { data: signUpData, error } = await supa.auth.signUp({ email, password: pass });
   if(error){ err.textContent='Lỗi: ' + error.message; return; }
 
   // Lưu mapping user↔email vào localStorage
   accs.push({ user, email, passHash: hashPass(pass) });
   saveAccounts(accs);
-
   err.textContent='';
-  // Auto login
-  document.getElementById('li-user').value = user;
-  document.getElementById('li-pass').value = pass;
-  switchAuthTab('login');
-  renderAccList();
-  setTimeout(doLogin, 500);
+
+  // Thử login thẳng luôn (không chờ confirm email)
+  const { data: signInData, error: signInErr } = await supa.auth.signInWithPassword({ email, password: pass });
+  if(signInErr){
+    // Nếu cần confirm email → báo user
+    err.textContent='✅ Tạo tài khoản thành công! Vui lòng đăng nhập lại.';
+    switchAuthTab('login');
+    document.getElementById('li-user').value = user;
+    renderAccList();
+    return;
+  }
+  // Login thành công luôn
+  await loadUserData(signInData.user);
 }
 
 // ── Load data từ Supabase ──
