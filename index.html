@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinVault — Quản Lý Cá Nhân</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Life Master — Quản Lý Tài Chính</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   /* ── Edmicro Light Theme ── */
@@ -311,6 +311,55 @@ body::before{content:'';position:fixed;inset:0;background:linear-gradient(135deg
   .disc-header{grid-template-columns:repeat(3,1fr);}
 }
 
+/* ══ MOBILE RESPONSIVE ══ */
+@media(max-width:600px){
+  /* Ẩn sidebar, dùng bottom nav */
+  .sidebar{ display:none !important; }
+  .app-shell{ flex-direction:column; }
+  .main-content{ height:calc(100vh - 56px); padding-bottom:0; }
+
+  /* Bottom navigation */
+  .mobile-nav{
+    display:flex !important;
+    position:fixed; bottom:0; left:0; right:0; z-index:200;
+    background:var(--s1); border-top:1px solid var(--border);
+    height:56px; align-items:center; justify-content:space-around;
+    box-shadow:0 -4px 20px rgba(59,91,219,0.08);
+  }
+  .mobile-nav-item{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:2px; padding:6px 12px; cursor:pointer; border-radius:10px;
+    font-size:10px; font-weight:600; color:var(--text3); transition:all .2s; flex:1;
+  }
+  .mobile-nav-item.active{ color:var(--blue); }
+  .mobile-nav-item span{ font-size:20px; line-height:1; }
+
+  /* Layout adjustments */
+  .sub-tabs{ padding:8px 10px 0; gap:4px; overflow-x:auto; flex-wrap:nowrap; }
+  .stab{ font-size:11px; padding:6px 10px; white-space:nowrap; }
+  .spanel{ padding:8px 10px; }
+  .card{ border-radius:12px; }
+  .ch{ padding:10px 12px; }
+  .cb{ padding:8px 10px !important; }
+  .ov-grid{ flex-direction:column !important; }
+
+  /* Stat cards 2 cột */
+  .sg4{ grid-template-columns:repeat(2,1fr) !important; }
+  .sg3{ grid-template-columns:repeat(2,1fr) !important; }
+  .sc{ padding:10px 12px; }
+  .sv{ font-size:15px !important; }
+
+  /* Login box */
+  .login-box{ width:calc(100vw - 32px); padding:24px 20px; }
+
+  /* Modal full screen */
+  .mbox{ width:100vw !important; max-width:100vw !important; border-radius:20px 20px 0 0 !important; position:fixed !important; bottom:0 !important; margin:0 !important; }
+
+  /* Timeline */
+  .tl-m3-name{ font-size:12px !important; }
+  .tl-m3-sub{ font-size:10px !important; }
+}
+
 /* ── DEFAULT = LIGHT MODE (Edmicro style) ── */
 :root{--bg:#f0f3fb;--s1:#fff;--s2:#f5f7fe;--s3:#eaedfa;--s4:#e0e5f5;--border:#e3e8f4;--border2:#d0d8ef;--text:#1a1d2e;--text2:#5a6282;--text3:#9aa3c2;}
 body.light{--bg:#f0f3fb;--s1:#ffffff;--s2:#f5f7fe;--s3:#eaedfa;--s4:#e0e5f5;--border:#e3e8f4;--border2:#d0d8ef;--text:#1a1d2e;--text2:#5a6282;--text3:#9aa3c2;}
@@ -382,9 +431,31 @@ body{overflow:hidden;height:100vh;margin:0;}
 
 /* SIDEBAR */
 .sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;z-index:100;box-shadow:2px 0 12px rgba(59,91,219,0.06);}
-.sb-logo{display:flex;align-items:center;gap:12px;padding:22px 20px 16px;border-bottom:1px solid var(--border);}
-.sb-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--mint),var(--blue));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.sb-logo-name{font-size:16px;font-weight:800;color:var(--blue);letter-spacing:.5px;}
+.sb-logo{display:flex;align-items:center;gap:12px;padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.sb-logo-icon{
+  width:40px;height:40px;flex-shrink:0;
+  border-radius:12px;
+  background:rgba(167,139,250,0.1);
+  border:1px solid rgba(167,139,250,0.25);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(100,60,255,0.2),inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.sb-logo-initials{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:15px;font-weight:800;
+  background:linear-gradient(135deg,#a78bfa,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;
+}
+.sb-logo-name{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:16px;font-weight:800;
+  color:var(--text);letter-spacing:-.3px;
+}
+.sb-logo-name span{
+  background:linear-gradient(90deg,#a78bfa,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
 .sb-logo-sub{font-size:10px;color:var(--text3);margin-top:1px;}
 .sb-date-box{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--s2);}
 .sb-date-day{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
@@ -392,9 +463,9 @@ body{overflow:hidden;height:100vh;margin:0;}
 .sb-nav{padding:8px 10px;flex:1;}
 .sb-nav-label{font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:4px 8px 8px;}
 .sb-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text3);transition:all .2s;margin-bottom:2px;background:transparent;}
-.sb-item:hover{background:var(--s2);color:var(--text2);}
-.sb-item.active{background:var(--blue-dim);color:var(--blue);font-weight:700;}
-.sb-item.active .sb-icon{filter:none;}
+.sb-item:hover:not(.active){background:var(--s3);color:var(--text2);}
+.sb-item.active{background:rgba(167,139,250,0.1)!important;color:#a78bfa!important;font-weight:700;}
+.sb-item.active .sb-icon{opacity:1;}
 .sb-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
 .sb-bottom{padding:10px 12px;border-top:1px solid var(--border);margin-top:auto;}
 .theme-btn{width:100%;padding:9px;border-radius:10px;border:1.5px solid var(--border);background:var(--s2);font-family:var(--sans);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
@@ -478,9 +549,9 @@ body{overflow:hidden;height:100vh;margin:0;}
 <div class="login-screen hidden" id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-icon">💎</div>
+      <div class="login-logo-icon" style="background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(52,211,153,0.2));border:1px solid rgba(167,139,250,0.3);"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">LM</div></div>
       <div>
-        <div class="login-logo-name">FinVault</div>
+        <div class="login-logo-name" style="font-family:'Plus Jakarta Sans',sans-serif;">Life <span style="background:linear-gradient(90deg,#a78bfa,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Master</span></div>
         <div class="login-logo-sub">Quản lý tài chính cá nhân</div>
       </div>
     </div>
@@ -521,10 +592,12 @@ body{overflow:hidden;height:100vh;margin:0;}
 <!-- ══ SIDEBAR TRÁI ══ -->
 <div class="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-icon">💎</div>
+    <div class="sb-logo-icon">
+      <div class="sb-logo-initials">LM</div>
+    </div>
     <div>
-      <div class="sb-logo-name">FinVault</div>
-      <div class="sb-logo-sub">Quản lý cá nhân</div>
+      <div class="sb-logo-name">Life <span>Master</span></div>
+      <div class="sb-logo-sub">Quản lý tài chính</div>
     </div>
   </div>
 
@@ -1087,13 +1160,25 @@ setTopbarDate();
 // MAIN TAB SWITCH
 // ════════════════════════════════════════
 function switchMain(name,el){
-  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  // Reset tất cả sidebar items và top tabs
+  document.querySelectorAll('.sb-item, .mtab').forEach(t=>t.classList.remove('active'));
+  // Active item được click — dùng data-panel để chắc chắn
+  const target = typeof el === 'string'
+    ? document.querySelector('.sb-item[data-panel="'+el+'"]')
+    : el;
+  if(target) target.classList.add('active');
+  // Chuyển panel
   document.querySelectorAll('.mpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById('mp-'+name).classList.add('active');
   if(name==='personal') renderOverview();
   if(name==='invest') renderInvest();
   if(name==='discipline') renderDisc();
+}
+
+function setMobileNav(name){
+  document.querySelectorAll('.mobile-nav-item').forEach(i=>i.classList.remove('active'));
+  const el = document.getElementById('mn-'+name);
+  if(el) el.classList.add('active');
 }
 
 // SUB TAB SWITCH
@@ -1994,24 +2079,7 @@ function loginAs(acc, saveSession){
   const userDataKey = dataKey(acc.user);
   const SCHED_VER = 'v20260309';
   const defaultD = {
-    transactions:[], tasks:[], schedules:[
-      {"id":"s01","name":"Thức dậy","start":"05:00","end":"05:15","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Vệ sinh cá nhân, uống nước ấm"},
-      {"id":"s02","name":"Tập thể dục","start":"05:15","end":"05:45","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Vận động nhẹ, giãn cơ hoặc bài tập năng lượng"},
-      {"id":"s03","name":"Tắm rửa","start":"05:45","end":"06:15","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Thư giãn và làm sạch cơ thể sau khi tập"},
-      {"id":"s04","name":"Học Tiếng Anh","start":"06:15","end":"07:00","color":"#7c3aed","repeat":"daily","days":[],"category":"study","note":"Tập trung nghe/nói hoặc học từ vựng (45 phút chất lượng)"},
-      {"id":"s05","name":"Nấu ăn sáng + Trưa","start":"07:00","end":"07:45","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Nấu đồ sáng và chuẩn bị hộp cơm mang đi làm"},
-      {"id":"s06","name":"Ăn sáng & Chuẩn bị","start":"07:45","end":"08:30","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Ăn sáng thong thả, chuẩn bị đồ đạc và di chuyển đi làm"},
-      {"id":"s07","name":"Làm việc 1","start":"08:30","end":"12:00","color":"#3b5bdb","repeat":"daily","days":[],"category":"work","note":"Bắt đầu ca làm việc buổi sáng"},
-      {"id":"s08","name":"Nghỉ trưa","start":"12:00","end":"13:30","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Ăn trưa (30p) và ngủ trưa (45p) để hồi phục sức lực"},
-      {"id":"s09","name":"Làm việc 2","start":"13:30","end":"18:00","color":"#3b5bdb","repeat":"daily","days":[],"category":"work","note":"Hoàn thành các công việc tại văn phòng"},
-      {"id":"s10","name":"Di chuyển","start":"18:00","end":"18:30","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Di chuyển đến nơi học (tranh thủ ăn nhẹ/uống sữa)"},
-      {"id":"s11","name":"Đi học","start":"18:30","end":"21:00","color":"#7c3aed","repeat":"daily","days":[],"category":"study","note":"Tập trung tiếp thu kiến thức tại lớp"},
-      {"id":"s12","name":"Về nhà & Giặt đồ","start":"21:00","end":"21:30","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Về đến nhà, bỏ quần áo vào máy giặt ngay"},
-      {"id":"s13","name":"Nấu ăn & Ăn tối","start":"21:30","end":"22:15","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Nấu nhanh các món đơn giản và ăn tối muộn"},
-      {"id":"s14","name":"Phơi quần áo","start":"22:15","end":"22:30","color":"#f5a623","repeat":"daily","days":[],"category":"personal","note":"Máy giặt xong, tranh thủ phơi đồ trong 15 phút"},
-      {"id":"s15","name":"Học bài / Làm việc","start":"22:30","end":"23:45","color":"#7c3aed","repeat":"daily","days":[],"category":"study","note":"Ôn lại bài đã học hoặc xử lý các dự án cá nhân"},
-      {"id":"s16","name":"Vệ sinh & Đi ngủ","start":"23:45","end":"00:00","color":"#0ea5e9","repeat":"daily","days":[],"category":"health","note":"Thả lỏng cơ thể, đi ngủ đúng 00:00"}
-    ], events:[], investments:[], investHistory:[], habits:[], checkins:{}, wakeGoal:'05:00', wakeSettings:{}
+    transactions:[], tasks:[], schedules:[], events:[], investments:[], investHistory:[], habits:[], checkins:{}, wakeGoal:'05:00', wakeSettings:{}
   };
 
   // Override D với data của user
@@ -2068,6 +2136,129 @@ document.addEventListener('keydown', e=>{
 
 // ═══ KHỞI ĐỘNG ═══
 initAuth();
+
+// ══════════════════════════════════════════
+// SUPABASE — Auth + Cloud Sync
+// ══════════════════════════════════════════
+const SUPA_URL = 'https://vfmredkgvhqibrehzrdi.supabase.co';
+const SUPA_KEY = 'sb_publishable_VTY_-EFduaEmZrrkkFHbvg_liLLAPYh';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ── Override initAuth để dùng Supabase Auth ──
+async function initAuth(){
+  const { data:{ session } } = await supa.auth.getSession();
+  if(session){
+    await loadUserData(session.user);
+  } else {
+    showLoginScreen();
+  }
+}
+
+// ── Đăng nhập ──
+async function doLogin(){
+  const user = document.getElementById('li-user').value.trim().toLowerCase();
+  const pass = document.getElementById('li-pass').value;
+  const err  = document.getElementById('login-err');
+  if(!user||!pass){ err.textContent='Vui lòng nhập đầy đủ!'; return; }
+
+  // Email = username@finvault.local — không cần tra localStorage
+  const email = user + '@finvault.local';
+  const { error } = await supa.auth.signInWithPassword({ email, password: pass });
+  if(error){ err.textContent='Tài khoản không đúng hoặc chưa đăng ký!'; return; }
+  err.textContent='';
+  const { data:{ session } } = await supa.auth.getSession();
+  await loadUserData(session.user);
+}
+
+// ── Đăng ký ──
+async function doRegister(){
+  const user  = document.getElementById('reg-user').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  const pass  = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  const err   = document.getElementById('reg-err');
+  if(!user){ err.textContent='Tên không hợp lệ!'; return; }
+  if(pass.length<6){ err.textContent='Mật khẩu tối thiểu 6 ký tự!'; return; }
+  if(pass!==pass2){ err.textContent='Mật khẩu không khớp!'; return; }
+  const accs = getAccounts();
+  if(accs.find(a=>a.user===user)){ err.textContent='Tên đã tồn tại!'; return; }
+
+  // Dùng email giả để đăng ký Supabase Auth
+  const email = user + '@finvault.local';
+  const { error } = await supa.auth.signUp({ email, password: pass });
+  if(error){ err.textContent='Lỗi: ' + error.message; return; }
+
+  // Lưu mapping user↔email vào localStorage
+  accs.push({ user, email, passHash: hashPass(pass) });
+  saveAccounts(accs);
+
+  err.textContent='';
+  // Auto login
+  document.getElementById('li-user').value = user;
+  document.getElementById('li-pass').value = pass;
+  switchAuthTab('login');
+  renderAccList();
+  setTimeout(doLogin, 500);
+}
+
+// ── Load data từ Supabase ──
+async function loadUserData(supaUser){
+  const uid = supaUser.id;
+  window._currentUser = supaUser.email.split('@')[0];
+
+  // Load từ bảng user_data
+  const { data, error } = await supa.from('user_data').select('data').eq('user_id', uid).single();
+
+  const SCHED_VER = 'v20260309';
+  const defaultD = {
+    transactions:[], tasks:[], schedules:[], events:[], investments:[], investHistory:[], habits:[], checkins:{}, wakeGoal:'05:00', wakeSettings:{}
+  };
+
+  Object.assign(D, defaultD);
+  if(data?.data){
+    try{
+      const parsed = typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
+      Object.assign(D, parsed);
+      if(parsed._schedVer !== SCHED_VER) D.schedules = defaultD.schedules;
+    }catch(e){}
+  }
+
+  // Override save → lưu lên Supabase (debounce 1.5s)
+  let saveTimer = null;
+  window.save = () => {
+    const obj = Object.assign({}, D, {_schedVer: SCHED_VER});
+    // Lưu local trước để nhanh
+    localStorage.setItem('fv3_' + window._currentUser, JSON.stringify(obj));
+    // Sau đó sync lên cloud
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      await supa.from('user_data').upsert({ user_id: uid, data: obj, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+    }, 1500);
+  };
+
+  // Update UI sidebar
+  const color = strColor(window._currentUser);
+  document.getElementById('sb-user-avatar').style.background = color;
+  document.getElementById('sb-user-avatar').textContent = window._currentUser[0].toUpperCase();
+  document.getElementById('sb-user-name').textContent = window._currentUser;
+  const mnUser = document.getElementById('mn-username');
+  if(mnUser) mnUser.textContent = window._currentUser;
+
+  // Show app
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-shell-wrap').style.display='flex';
+
+  setTimeout(()=>{ renderOverview(); renderTimeline(); renderTaskBox(); updateStreak(); setTopbarDate(); }, 100);
+}
+
+// ── Đăng xuất ──
+async function doLogout(){
+  if(!confirm('Đăng xuất?')) return;
+  await supa.auth.signOut();
+  window._currentUser = null;
+  D.transactions=[]; D.tasks=[]; D.habits=[]; D.checkins={}; D.investments=[]; D.investHistory=[]; D.events=[];
+  showLoginScreen();
+}
+
 </script>
 
 <!-- Modal xem/sửa task -->
