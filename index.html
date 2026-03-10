@@ -1130,7 +1130,6 @@ const load = () => {
     if(saved._schedVer !== SCHED_VER) D.schedules = defaultScheds;
   }catch(e){} }
 };
-// load() sẽ được gọi qua initAuth sau khi DOM ready
 
 // ── helpers ──
 const fmt = n => new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(n||0);
@@ -1154,7 +1153,6 @@ function setTopbarDate(){
 }
 setTopbarDate();
 
-// initAuth() sẽ được gọi ở cuối file sau khi khai báo xong
 
 // ════════════════════════════════════════
 // MAIN TAB SWITCH
@@ -1984,167 +1982,6 @@ function saveAccounts(arr){ localStorage.setItem(AUTH_KEY, JSON.stringify(arr));
 const AVATAR_COLORS = ['#3b5bdb','#7c3aed','#f97316','#00b4d8','#e63946','#2dc653'];
 function strColor(s){ let h=0; for(let c of s) h=(h*31+c.charCodeAt(0))&0xffff; return AVATAR_COLORS[h%AVATAR_COLORS.length]; }
 
-function initAuth(){
-  const session = localStorage.getItem(SESSION_KEY);
-  if(session){
-    const accs = getAccounts();
-    const acc = accs.find(a=>a.user===session);
-    if(acc){ loginAs(acc, false); return; }
-  }
-  showLoginScreen();
-}
-
-function showLoginScreen(){
-  document.getElementById('login-screen').classList.remove('hidden');
-  document.getElementById('app-shell-wrap').style.display='none';
-  renderAccList();
-}
-
-function renderAccList(){
-  const accs = getAccounts();
-  const wrap = document.getElementById('login-acc-wrap');
-  const list = document.getElementById('login-acc-list');
-  if(accs.length===0){ wrap.style.display='none'; return; }
-  wrap.style.display='block';
-  list.innerHTML = accs.map(a=>`
-    <div class="login-acc-item" onclick="quickLogin('${a.user}')">
-      <div class="login-acc-avatar" style="background:${strColor(a.user)}">${a.user[0].toUpperCase()}</div>
-      <div>
-        <div class="login-acc-name">${a.user}</div>
-        <div class="login-acc-sub">Bấm để điền nhanh</div>
-      </div>
-    </div>`).join('');
-}
-
-function quickLogin(user){
-  document.getElementById('li-user').value = user;
-  document.getElementById('li-pass').focus();
-}
-
-function doLogin(){
-  const user = document.getElementById('li-user').value.trim().toLowerCase();
-  const pass = document.getElementById('li-pass').value;
-  const err = document.getElementById('login-err');
-  if(!user||!pass){ err.textContent='Vui lòng nhập đầy đủ!'; return; }
-  const accs = getAccounts();
-  const acc = accs.find(a=>a.user===user);
-  if(!acc){ err.textContent='Tài khoản không tồn tại. Hãy tạo mới!'; return; }
-  if(acc.passHash !== hashPass(pass)){ err.textContent='Mật khẩu không đúng!'; return; }
-  err.textContent='';
-  loginAs(acc, true);
-}
-
-function showRegister(){ switchAuthTab('register'); }
-
-function switchAuthTab(tab){
-  const isLogin = tab==='login';
-  document.getElementById('login-form-wrap').style.display = isLogin?'block':'none';
-  document.getElementById('reg-form-wrap').style.display   = isLogin?'none':'block';
-  const lb=document.getElementById('tab-login-btn'), rb=document.getElementById('tab-reg-btn');
-  if(lb&&rb){
-    lb.style.background = isLogin?'#3b5bdb':'transparent';
-    lb.style.color = isLogin?'#fff':'#9aa3c2';
-    lb.style.fontWeight = isLogin?'700':'600';
-    rb.style.background = isLogin?'transparent':'#3b5bdb';
-    rb.style.color = isLogin?'#9aa3c2':'#fff';
-    rb.style.fontWeight = isLogin?'600':'700';
-  }
-  document.getElementById('login-err').textContent='';
-  if(document.getElementById('reg-err')) document.getElementById('reg-err').textContent='';
-}
-
-function doRegister(){
-  const user = document.getElementById('reg-user').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
-  const pass  = document.getElementById('reg-pass').value;
-  const pass2 = document.getElementById('reg-pass2').value;
-  const err   = document.getElementById('reg-err');
-  if(!user){ err.textContent='Tên không hợp lệ (chỉ dùng a-z, 0-9, _)!'; return; }
-  if(pass.length<4){ err.textContent='Mật khẩu tối thiểu 4 ký tự!'; return; }
-  if(pass!==pass2){ err.textContent='Mật khẩu nhập lại không khớp!'; return; }
-  const accs = getAccounts();
-  if(accs.find(a=>a.user===user)){ err.textContent='Tên tài khoản đã tồn tại!'; return; }
-  accs.push({user, passHash:hashPass(pass)});
-  saveAccounts(accs);
-  // Tự login luôn
-  err.textContent='';
-  document.getElementById('li-user').value=user;
-  document.getElementById('li-pass').value=pass;
-  switchAuthTab('login');
-  renderAccList();
-  doLogin();
-}
-
-function loginAs(acc, saveSession){
-  // Load data của user này
-  const userDataKey = dataKey(acc.user);
-  const SCHED_VER = 'v20260309';
-  const defaultD = {
-    transactions:[], tasks:[], schedules:[], events:[], investments:[], investHistory:[], habits:[], checkins:{}, wakeGoal:'05:00', wakeSettings:{}
-  };
-
-  // Override D với data của user
-  const saved = localStorage.getItem(userDataKey);
-  Object.assign(D, defaultD);
-  if(saved){
-    try{
-      const parsed = JSON.parse(saved);
-      Object.assign(D, parsed);
-      if(parsed._schedVer !== SCHED_VER) D.schedules = defaultD.schedules;
-    }catch(e){}
-  }
-
-  // Override save để lưu theo user
-  window._currentUser = acc.user;
-  window.save = () => {
-    const obj = Object.assign({}, D, {_schedVer: SCHED_VER});
-    localStorage.setItem(dataKey(acc.user), JSON.stringify(obj));
-  };
-
-  if(saveSession) localStorage.setItem(SESSION_KEY, acc.user);
-
-  // Update UI
-  const color = strColor(acc.user);
-  document.getElementById('sb-user-avatar').style.background = color;
-  document.getElementById('sb-user-avatar').textContent = acc.user[0].toUpperCase();
-  document.getElementById('sb-user-name').textContent = acc.user;
-
-  // Show app
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('app-shell-wrap').style.display='flex';
-
-  // Re-render sau khi login
-  setTimeout(()=>{ renderOverview(); renderTimeline(); renderTaskBox(); updateStreak(); setTopbarDate(); }, 100);
-}
-
-function doLogout(){
-  if(!confirm('Đăng xuất khỏi tài khoản?')) return;
-  localStorage.removeItem(SESSION_KEY);
-  window._currentUser = null;
-  // Reset D
-  D.transactions=[]; D.tasks=[]; D.habits=[]; D.checkins={}; D.investments=[]; D.investHistory=[]; D.events=[];
-  showLoginScreen();
-}
-
-// Cho phép Enter để login
-document.addEventListener('keydown', e=>{
-  if(e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')){
-    const regVisible = document.getElementById('reg-form-wrap').style.display!=='none';
-    if(regVisible) doRegister(); else doLogin();
-  }
-});
-
-
-// ═══ KHỞI ĐỘNG ═══
-initAuth();
-
-// ══════════════════════════════════════════
-// SUPABASE — Auth + Cloud Sync
-// ══════════════════════════════════════════
-const SUPA_URL = 'https://vfmredkgvhqibrehzrdi.supabase.co';
-const SUPA_KEY = 'sb_publishable_VTY_-EFduaEmZrrkkFHbvg_liLLAPYh';
-const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
-
-// ── Override initAuth để dùng Supabase Auth ──
 async function initAuth(){
   const { data:{ session } } = await supa.auth.getSession();
   if(session){
