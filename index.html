@@ -1120,7 +1120,28 @@ let D = {
   habits:[], checkins:{}, wakeGoal:'05:30', wakeSettings:{}
 };
 const SCHED_VER = 'v20260309'; // tăng version này mỗi khi đổi lịch mặc định
-const save = () => { const obj=Object.assign({},D,{_schedVer:SCHED_VER}); localStorage.setItem('fv3', JSON.stringify(obj)); };
+// save() sẽ được override bởi loadUserData() sau khi đăng nhập
+// Tạm thời lưu localStorage để không crash trước khi login
+let saveTimer = null;
+function save(){
+  if(window._supaUser && window._supaUID){
+    const SCHED_VER2 = 'v20260309';
+    const obj = Object.assign({}, D, {_schedVer: SCHED_VER2});
+    localStorage.setItem('fv3_' + window._currentUser, JSON.stringify(obj));
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      const { error: saveErr } = await supa.from('user_data').upsert(
+        { user_id: window._supaUID, data: obj, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id' }
+      );
+      if(saveErr) console.error('❌ Save error:', saveErr.message);
+      else console.log('✅ Saved to Supabase');
+    }, 1000);
+  } else {
+    // Chưa đăng nhập, chỉ lưu local
+    localStorage.setItem('fv3_tmp', JSON.stringify(D));
+  }
+}
 const load = () => {
   const s=localStorage.getItem('fv3');
   if(s){ try{
@@ -2085,6 +2106,8 @@ async function doRegister(){
 // ── Load data từ Supabase ──
 async function loadUserData(supaUser){
   const uid = supaUser.id;
+  window._supaUID = uid;
+  window._supaUser = supaUser;
   window._currentUser = supaUser.email.split('@')[0];
 
   // Load từ bảng user_data
@@ -2104,23 +2127,8 @@ async function loadUserData(supaUser){
     }catch(e){}
   }
 
-  // Override save → lưu lên Supabase (debounce 1.5s)
-  let saveTimer = null;
-  window.save = () => {
-    const obj = Object.assign({}, D, {_schedVer: SCHED_VER});
-    localStorage.setItem('fv3_' + window._currentUser, JSON.stringify(obj));
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(async () => {
-      const { error: saveErr } = await supa.from('user_data').upsert(
-        { user_id: uid, data: obj, updated_at: new Date().toISOString() },
-        { onConflict: 'user_id' }
-      );
-      if(saveErr) console.error('❌ Save error:', saveErr.message);
-      else console.log('✅ Data saved to Supabase');
-    }, 1500);
-  };
-  // Lưu ngay lần đầu khi đăng nhập
-  window.save();
+  // save() global đã tự handle Supabase sync qua window._supaUID
+  save(); // lưu ngay lần đầu
 
   // Update UI sidebar
   const color = strColor(window._currentUser);
@@ -2142,6 +2150,8 @@ async function doLogout(){
   if(!confirm('Đăng xuất?')) return;
   await supa.auth.signOut();
   window._currentUser = null;
+  window._supaUID = null;
+  window._supaUser = null;
   D.transactions=[]; D.tasks=[]; D.habits=[]; D.checkins={}; D.investments=[]; D.investHistory=[]; D.events=[];
   showLoginScreen();
 }
@@ -2176,6 +2186,22 @@ async function doLogout(){
 </div>
 
 </div><!-- end main-content -->
+
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav" style="display:none;">
+  <div class="mobile-nav-item active" id="mn-personal" onclick="switchMain('personal',document.querySelector('.sb-item[data-panel=personal]'));setMobileNav('personal');">
+    <span>🏠</span>Cá Nhân
+  </div>
+  <div class="mobile-nav-item" id="mn-invest" onclick="switchMain('invest',document.querySelector('.sb-item[data-panel=invest]'));setMobileNav('invest');">
+    <span>📈</span>Đầu Tư
+  </div>
+  <div class="mobile-nav-item" id="mn-discipline" onclick="switchMain('discipline',document.querySelector('.sb-item[data-panel=discipline]'));setMobileNav('discipline');">
+    <span>💪</span>Kỷ Luật
+  </div>
+  <div class="mobile-nav-item" id="mn-account" onclick="doLogout();">
+    <span>👤</span><span id="mn-username">Tôi</span>
+  </div>
+</nav>
 </div><!-- end app-shell -->
 </body>
 </html>
